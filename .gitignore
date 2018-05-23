@@ -7,6 +7,10 @@
 # Compiled class file
 *.class
 
+# Out Folder
+out
+
+
 # Log file
 *.log
 
