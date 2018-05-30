@@ -22,10 +22,6 @@ class: middle, center
 - Lecture advanced java for bioinformatics (Wintersemester, Prof. Huson)
 
 ---
-# Running a JavaFX Application:
-
-
----
 # The scene graph
 [doc](https://docs.oracle.com/javafx/2/scenegraph/jfxpub-scenegraph.htm)
 
@@ -180,7 +176,6 @@ proteinGraph.nodeList.addListener((ListChangeListener<ProteinNode>) c -> {
 
 ``` 
 
-```
 ---
 # Design patterns
 
@@ -188,7 +183,7 @@ Proposition for JavaFX: MVC **M**odel **V**iew **C**ontroller
 
 ![MVC](img/mvc.png)
 
-There are many variations on this scheme. You can try to do something similar to  [this](https://stackoverflow.com/a/32343342)
+There are many variations on this scheme
 ---
 # Model:
 
@@ -239,7 +234,8 @@ with FXML:
 ---
 # (Gluon) Scene Builder
 
-- Can be integrated into IntelliJ
+- Integrated into IntelliJ
+* Configure FXML Layout with comfortable GUI
 
 ---
 
