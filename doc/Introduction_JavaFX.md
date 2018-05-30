@@ -54,7 +54,7 @@ class: middle, center
         - FlowPane
         - Hbox
         - VBox
-	These panes are called **Layout-Panes **
+	These panes are called **Layout-Panes**
 
 [doc](https://docs.oracle.com/javafx/2/layout/builtin_layouts.htm)
 ---
@@ -97,18 +97,20 @@ Interesting Properties:
 
 
 ---
+
 # Properties
 
 [doc](https://docs.oracle.com/javafx/2/binding/jfxpub-binding.htm)
 
 Limits of static, linear program flow
-    - Methods need to be executed when objects are modified
-    - Dynamic responses to user input (click button)
-    - Update view when model changes
+- Methods need to be executed when objects are modified
+- Dynamic responses to user input (click button)
+- Update view when model changes
 
 All this can be achieved with *Properties* and *Bindings*
 
 ---
+
 # Properties
 
 Instead of *"normal"* classes use properties
@@ -177,6 +179,7 @@ proteinGraph.nodeList.addListener((ListChangeListener<ProteinNode>) c -> {
 ``` 
 
 ---
+
 # Design patterns
 
 Proposition for JavaFX: MVC **M**odel **V**iew **C**ontroller
@@ -184,9 +187,10 @@ Proposition for JavaFX: MVC **M**odel **V**iew **C**ontroller
 ![MVC](img/mvc.png)
 
 There are many variations on this scheme
----
-# Model:
 
+---
+
+# Model:
 * contains data
 * calculates stuff
 * file I/O
@@ -195,16 +199,19 @@ There are many variations on this scheme
 * works independent of GUI
 
 ---
+
 # View:
 * Contains all graphical elements (nodes)
 * Only display, no calculating methods
 
 ---
+
 # Controller:
 * Connects View and Model
 * Contains 
 
 ---
+
 # FXML
 Based on XML (similar to html)
 
@@ -229,17 +236,14 @@ with FXML:
     </center>
 </BorderPane>
 ```
+
 ![borderpane](img/borderpane.png)
 
 ---
-# (Gluon) Scene Builder
 
+# (Gluon) Scene Builder
 - Integrated into IntelliJ
 * Configure FXML Layout with comfortable GUI
 
 ---
-
-
-
-
 
