@@ -10,7 +10,7 @@ This project is still under heavy development.
 
 ### Introduction into JavaFX:
 * [HTML Presentation](https://rawgit.com/imgag/ProgrammierPraktikum2018_Gruppe3/master/doc/javafx_presentation.html)
-* [Document](https://github.com/imgag/ProgrammierPraktikum2018_Gruppe3/master/doc/Introduction_JavaFX.md)
+* [Document](https://github.com/imgag/ProgrammierPraktikum2018_Gruppe3/blob/master/doc/Introduction_JavaFX.md)
 
 ### Weekly meetings:
 Wednesday 16:30 Frauenklinik
