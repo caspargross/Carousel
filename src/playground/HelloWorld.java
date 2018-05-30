@@ -10,6 +10,10 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import jdk.jfr.events.ExceptionThrownEvent;
+import javax.xml.stream.events.Attribute;
+import java.lang.Object;
+import javafx.scene.shape.*;
+
 
 public class HelloWorld extends Application {
 
@@ -47,9 +51,64 @@ public class HelloWorld extends Application {
             lineArray[i] = new Line(tempSX, tempSY, tempEX, tempEY);
         }
         return lineArray;
+    }
 
+    // Creates an arc-segment as a path to draw it later on the display. Receives the distance from center r/radius the position of the center, the height of the segment, the length, a start position and a boolean which determines the color depending on the direction of the segment
+    // TODO: propably better to create a arc-segment class consisting of 2 lines and 2 archsegments.
+    // Note: maybe make a class for center coordinates aswell. otherwise way too many argument.
+    // ToDO: currently start = 0 is at 0 degree in polar coordinates = 3´o clock - should be at 0
+    private static Path drawArchsegmentPath(double centerX, double centerY, double radius, double height, double length, double start, boolean direction){
+        //create the 4 Coordinates out of whoom the Path later will be constructed. Point A,B are from the first line, C,D are depending on direction further to 0 or closer
+        double aX,bX,cX,dX,aY,bY,cY,dY;
+        //depeding on direction: length will be positive / negative
+
+        bX = centerX+ radius*Math.cos(Math.toRadians((start/20000)*360));
+        bY = centerY+  radius * (Math.sin(Math.toRadians((start/20000)*360)));
+        aX = centerX+ (radius+height)*Math.cos(Math.toRadians((start/20000)*360));
+        aY = centerY+  (radius+height) * (Math.sin(Math.toRadians((start/20000)*360)));
+        cX = centerX+ radius*Math.cos(Math.toRadians(((start+length)/20000)*360));
+        cY = centerY+  radius * (Math.sin(Math.toRadians(((start+length)/20000)*360)));
+        dX = centerX+ (radius+height)*Math.cos(Math.toRadians(((start+length)/20000)*360));
+        dY = centerY+  (radius+height) * (Math.sin(Math.toRadians(((start+length)/20000)*360)));
+
+        // since arcs behaved weirdly when traversing from B to C (inward bow) with fix1 + fix 2 we travel with "the cursor" to C so we can co from C to B with an arc + continue afterwards from C to D
+        Path temp = new Path();
+        MoveTo moveTo = new MoveTo();
+        moveTo.setX(aX);
+        moveTo.setY(aY);
+        temp.getElements().add(moveTo);
+        LineTo firstLine = new LineTo();
+        firstLine.setX(bX);
+        firstLine.setY(bY);
+        temp.getElements().add(firstLine);
+        MoveTo fix1 = new MoveTo();
+        fix1.setX(cX);
+        fix1.setY(cY);
+        temp.getElements().add(fix1);
+        ArcTo outerArc = new ArcTo();
+        outerArc.setX(bX);
+        outerArc.setY(bY);
+        outerArc.setRadiusX(150);
+        outerArc.setRadiusY(150);
+        temp.getElements().add(outerArc);
+        MoveTo fix2 = new MoveTo();
+        fix2.setX(cX);
+        fix2.setY(cY);
+        temp.getElements().add(fix2);
+        LineTo secondLine = new LineTo();
+        secondLine.setX(dX);
+        secondLine.setY(dY);
+        temp.getElements().add(secondLine);
+        ArcTo innerArc = new ArcTo();
+        innerArc.setX(aX);
+        innerArc.setY(aY);
+        innerArc.setRadiusX(150);
+        innerArc.setRadiusY(150);
+        temp.getElements().add(innerArc);
+        return temp;
 
     }
+
     private Pane createHelloWorld() {
         Pane myPane = new Pane();
 
@@ -85,6 +144,14 @@ public class HelloWorld extends Application {
         for(int i = 0; i < tickmarkArray.length; i++){
             myPane.getChildren().add(tickmarkArray[i]);
         }
+
+        // test of the drawArchsegement section. Note: currently the different levels of segments are determined by the radius. Later on a "level" could simply be used as an attribute to determine on which layer of the circles the segment should be drawn onto
+        Path test = drawArchsegmentPath(150,150,150,10,2000,5000,true);
+        myPane.getChildren().add(test);
+        Path test3 = drawArchsegmentPath(150,150,140,10,1000,5000,true);
+        myPane.getChildren().add(test3);
+        Path test2 = drawArchsegmentPath(150,150,150,10,2000,1000,false);
+        myPane.getChildren().add(test2);
         return myPane;
     }
 }
