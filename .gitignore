@@ -10,6 +10,8 @@
 # Out Folder
 out
 
+# Data Folder
+data
 
 # Log file
 *.log
