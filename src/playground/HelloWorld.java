@@ -147,11 +147,32 @@ public class HelloWorld extends Application {
 
         // test of the drawArchsegement section. Note: currently the different levels of segments are determined by the radius. Later on a "level" could simply be used as an attribute to determine on which layer of the circles the segment should be drawn onto
         Path test = drawArchsegmentPath(150,150,150,10,2000,5000,true);
+        test.setStroke(Color.GREEN);
         myPane.getChildren().add(test);
         Path test3 = drawArchsegmentPath(150,150,140,10,1000,5000,true);
+        test3.setStroke(Color.RED);
         myPane.getChildren().add(test3);
         Path test2 = drawArchsegmentPath(150,150,150,10,2000,1000,false);
         myPane.getChildren().add(test2);
+
+        Arc testarc = new Arc(150,150,110,110,45,270);
+        testarc.setType(ArcType.OPEN);
+        testarc.setFill(Color.TRANSPARENT);
+        testarc.setStroke(Color.BLACK);
+        myPane.getChildren().add(testarc);
+
+        Arc arcOpen = new Arc();
+        arcOpen.setCenterX(150.0f);
+        arcOpen.setCenterY(150.0f);
+        arcOpen.setRadiusX(25.0f);
+        arcOpen.setRadiusY(25.0f);
+        arcOpen.setStartAngle(45.0f);
+        arcOpen.setLength(270.0f);
+        arcOpen.setType(ArcType.OPEN);
+        arcOpen.setStroke(Color.BLACK);
+        arcOpen.setFill(Color.TRANSPARENT);
+        myPane.getChildren().add(arcOpen);
         return myPane;
+
     }
 }
