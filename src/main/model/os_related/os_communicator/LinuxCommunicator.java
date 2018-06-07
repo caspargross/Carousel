@@ -23,11 +23,13 @@ public class LinuxCommunicator extends OSCommunicator implements CanMapReadsToRe
 
     /**
      * Runs a shell command to map reads to a reference sequence given a file with the reference sequence, a file with
-     * reads and an output file path. The shell command will be executed within a new thread.
+     * reads and an output file path. The shell command will be executed within a new thread. Please note that
+     * outputFile should not contain a file ending, since these will be added by the method, because two files with
+     * different file endings, .bam and .bai, will be created.
      *
-     * @param referenceSequenceFile the file containing the reference sequence
-     * @param readsFile             the file containing the reads
-     * @param outputFile            the output file
+     * @param referenceSequenceFile the file containing the reference sequence with file ending
+     * @param readsFile             the file containing the reads with file ending
+     * @param outputFile            the output file without file endings
      * @param eventHandlerList      a list of handler to be added to the JavaFX Task
      *
      * @throws IOException
