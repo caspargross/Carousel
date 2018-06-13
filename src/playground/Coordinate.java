@@ -10,6 +10,9 @@ public class Coordinate {
         this.x = x;
         this.y = y;
     }
+    public Coordinate(){
+
+    }
 
     //SETTER
     public void setX(double x) {

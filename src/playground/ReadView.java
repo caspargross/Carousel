@@ -14,19 +14,14 @@ public class ReadView {
     private GlobalInformation info;
 
 
-    public ReadView(Read read, GlobalInformation info,double level){
+    public ReadView(Read read, GlobalInformation info,DoubleProperty level){
         this.read = read;
-        this.info.setCenter(info.getCenter());
+       /* this.info.setCenter(info.getCenter());
         this.info.setGlobalLength(info.getGlobalLength());
         this.info.setHeight(info.getHeight());
         this.info.setRadius(info.getRadius());
-        this.level.setValue(level);
-        //Bind effRadius to level,radius, height
-        effRadius.bind(this.level.multiply(this.info.getHeight()).add(this.info.getRadius()));
-        // Add Listener to level: if Level changes: create a new Archsegment
-        this.level.addListener((observable, oldValue, newValue) -> {
-            this.archSegment = new ArchSegment(read,this.info,effRadius.getValue());
-        });
+        this.level.setValue(level.getValue());*/
+        this.archSegment = new ArchSegment(read,info,level);
     }
     //SETTER
     public void setLevel(double level){

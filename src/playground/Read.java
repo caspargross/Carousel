@@ -1,15 +1,14 @@
 package playground;
 
 public class Read {
-    private double length;
     private double start;
-    private double stop;
+    private double length;
     private boolean direction;
     private String sequence;
     private String cigar;
     private boolean overlap;
 
-    public Read (double length, double start, double stop, boolean direction, String sequence,String cigar,boolean overlap, double globalLength){
+    public Read (double start, double length, boolean direction, String sequence,String cigar,boolean overlap){
         // If direction = false (counter-clockwise) we set length at its negative value. Thus we save some work later (we can just add start+length and not have to worry about the direction in the math-part)
         if(direction){
             this.length = length;
@@ -18,7 +17,6 @@ public class Read {
             this.length =length*(-1);
         }
         this.start = start;
-        this.stop = stop;
         this.direction = direction;
         this.sequence = sequence;
         this.cigar = cigar;
@@ -30,9 +28,6 @@ public class Read {
     }
     public void setStart(double start){
         this.start = start;
-    }
-    public void setStop(double stop){
-        this.stop = stop;
     }
     public void setDirection(boolean direction){
         this.direction = direction;
@@ -53,9 +48,6 @@ public class Read {
     }
     public double getStart() {
         return start;
-    }
-    public double getStop() {
-        return stop;
     }
     public boolean getDirection(){
         return direction;

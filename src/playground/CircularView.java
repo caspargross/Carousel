@@ -1,16 +1,19 @@
 package playground;
 
+import javafx.beans.property.DoubleProperty;
+
 public class CircularView {
     // contains an Array of Readviews
     private ReadView[]readViews;
-    private Double[] levelArray;
+    private DoubleProperty[] levelArray;
     private GlobalInformation info;
     //CONSTRUCTOR
-    public CircularView (Read[] readArray,GlobalInformation info ){
+    public CircularView (Read[] readArray,GlobalInformation info, DoubleProperty[] levelArray ){
         this.info.setCenter(info.getCenter());
         this.info.setGlobalLength(info.getGlobalLength());
         this.info.setHeight(info.getHeight());
         this.info.setRadius(info.getRadius());
+        this.levelArray = levelArray;
 
         // Fill the Array of readViews
         for (int i = 0; i < readArray.length;i++) {
@@ -20,5 +23,9 @@ public class CircularView {
     public void createLevelArray(){
         //DO magic- so that we have a level-array
         //TODO: maybe move this levelArray to GlobalInformation
+    }
+
+    public ReadView[] getReadViews() {
+        return readViews;
     }
 }

@@ -1,6 +1,11 @@
 package playground;
 
+import com.sun.deploy.uitoolkit.DragContext;
 import javafx.application.Application;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.event.EventHandler;
+import javafx.geometry.Point3D;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
@@ -8,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.scene.input.*;
 import javafx.stage.Stage;
 import jdk.jfr.events.ExceptionThrownEvent;
 import javax.xml.stream.events.Attribute;
@@ -120,22 +126,22 @@ public class HelloWorld extends Application {
         // Add special tickmars + Labels to display
         Line line0 = new Line(150,40,150,50);
         myPane.getChildren().add(line0);
-        Text line0Text = centerTextOnCoordinate("0",150,60);
+        Text line0Text = centerTextOnCoordinate("15",150,60);
         myPane.getChildren().add(line0Text);
 
         Line line5 = new Line(260,150,250,150);
         myPane.getChildren().add(line5);
-        Text line5Text = centerTextOnCoordinate("5",240,150);
+        Text line5Text = centerTextOnCoordinate("0",240,150);
         myPane.getChildren().add(line5Text);
 
         Line line10 = new Line(150,250,150,260);
         myPane.getChildren().add(line10);
-        Text line10Text = centerTextOnCoordinate("10",150,240);
+        Text line10Text = centerTextOnCoordinate("5",150,240);
         myPane.getChildren().add(line10Text);
 
         Line line15 = new Line(50,150,40,150);
         myPane.getChildren().add(line15);
-        Text line15Text = centerTextOnCoordinate("15",60,150);
+        Text line15Text = centerTextOnCoordinate("10",60,150);
         myPane.getChildren().add(line15Text);
 
 
@@ -144,7 +150,7 @@ public class HelloWorld extends Application {
         for(int i = 0; i < tickmarkArray.length; i++){
             myPane.getChildren().add(tickmarkArray[i]);
         }
-
+        /*
         // test of the drawArchsegement section. Note: currently the different levels of segments are determined by the radius. Later on a "level" could simply be used as an attribute to determine on which layer of the circles the segment should be drawn onto
         Path test = drawArchsegmentPath(150,150,150,10,2000,5000,true);
         test.setStroke(Color.GREEN);
@@ -172,7 +178,105 @@ public class HelloWorld extends Application {
         arcOpen.setStroke(Color.BLACK);
         arcOpen.setFill(Color.TRANSPARENT);
         myPane.getChildren().add(arcOpen);
+        */
+
+        //Mouse-Drag to Rotate stuff
+        Point3D tempPoint= new Point3D(0,0,150);
+        myPane.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                myPane.setRotationAxis(tempPoint);
+                double tempScaleX =myPane.getScaleX();
+                double tempScaleY = myPane.getScaleY();
+                myPane.setScaleX(1);
+                myPane.setScaleY(1);
+                myPane.setRotate(event.getSceneX());
+                myPane.setScaleX(tempScaleX);
+                myPane.setScaleY(tempScaleY);
+            }
+        });
+
+        //Mouse-Zoom to Zoom Note only DeltaY is relevant (vertical scroll amount)
+
+        myPane.setOnScroll(new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                //Divide in 2 Cases: getDeltaY is negative (downscroll) and getDeltaY is positive (upscroll)
+                if(event.getDeltaY()>0){
+                    myPane.setScaleX(myPane.getScaleX()*1.5);
+                    myPane.setScaleY(myPane.getScaleY()*1.25);
+
+                }
+                if(event.getDeltaY()<0 && myPane.getScaleY()>0.6){
+                    myPane.setScaleX(myPane.getScaleX()*(1/(1.5)));
+                    myPane.setScaleY(myPane.getScaleY()*(1/(1.25)));
+                    System.out.println(myPane.getScaleY());
+
+                }
+
+                System.out.println(event.getDeltaY()*1/40);
+            }
+        });
+
+
+        //TEST READ ARRAY
+
+        Read[] readArray= new Read[6];
+        readArray[0] = new Read(2000,1000,true,"READ1","CIGAR1",false);
+        readArray[1] = new Read(7000,5000,false,"READ2","CIGAR2",false);
+        readArray[2] = new Read(13000,500,true,"READ3","CIGAR3",false);
+        readArray[3] = new Read( 4000,500,true,"READ4","CIGAR4",false);
+        readArray[4] = new Read(1000,2000,false,"READ5","CIGAR5OVERLAP",true);
+        readArray[5] = new Read(18000,2000,true,"READ6","CIGAR6",false);
+
+        // LEVEL ARRAY
+        DoubleProperty[] levelArray = new SimpleDoubleProperty[6];
+        for(int i = 0; i < levelArray.length;i++){
+            levelArray[i] = new SimpleDoubleProperty();
+            levelArray[i].setValue(i);
+        }
+        //GlobalInformation
+        Coordinate center = new Coordinate(150,150);
+        GlobalInformation gInfo = new GlobalInformation(center,100,10,20000);
+        //CIRCULAR VIEW
+        /*CircularView demo = new CircularView(readArray,gInfo,levelArray);
+        ReadView[] temp = demo.getReadViews();
+        for(int i = 0; i < demo.getReadViews().length;i++){
+            myPane.getChildren().add(temp[i].getArchSegment().getInner());
+            myPane.getChildren().add(temp[i].getArchSegment().getOuter());
+            myPane.getChildren().add(temp[i].getArchSegment().getStart());
+            myPane.getChildren().add(temp[i].getArchSegment().getStop());
+        }*/
+        //READVIEW TEST
+
+        ReadView testRead = new ReadView(readArray[1],gInfo,levelArray[1]);
+        myPane.getChildren().add(testRead.getArchSegment().getInner());
+        myPane.getChildren().add(testRead.getArchSegment().getOuter());
+        myPane.getChildren().add(testRead.getArchSegment().getStart());
+        myPane.getChildren().add(testRead.getArchSegment().getStop());
+        ReadView testRead2 = new ReadView(readArray[0],gInfo,levelArray[0]);
+        myPane.getChildren().add(testRead2.getArchSegment().getInner());
+        myPane.getChildren().add(testRead2.getArchSegment().getOuter());
+        myPane.getChildren().add(testRead2.getArchSegment().getStart());
+        myPane.getChildren().add(testRead2.getArchSegment().getStop());
+        ReadView testRead4 = new ReadView(readArray[4],gInfo,levelArray[4]);
+        myPane.getChildren().add(testRead4.getArchSegment().getInner());
+        myPane.getChildren().add(testRead4.getArchSegment().getOuter());
+        myPane.getChildren().add(testRead4.getArchSegment().getStart());
+        myPane.getChildren().add(testRead4.getArchSegment().getStop());
+        ReadView testRead5 = new ReadView(readArray[5],gInfo,levelArray[5]);
+        myPane.getChildren().add(testRead5.getArchSegment().getInner());
+        myPane.getChildren().add(testRead5.getArchSegment().getOuter());
+        myPane.getChildren().add(testRead5.getArchSegment().getStart());
+        myPane.getChildren().add(testRead5.getArchSegment().getStop());
+
+
+
+
         return myPane;
+
+
+
 
     }
 }
