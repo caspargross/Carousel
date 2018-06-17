@@ -67,7 +67,7 @@ public class LinuxCommunicator extends OSCommunicator implements CanMapReadsToRe
     /**
      * Returns the specific Linux shell name.
      *
-     * @return
+     * @return the specific Linux shell name
      */
     @Override
     protected String getShellName( ) {

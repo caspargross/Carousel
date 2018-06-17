@@ -23,9 +23,10 @@ public interface CanMapReadsToReferenceSequence {
      * The signature for a function which runs a shell command to map reads to a reference sequence given a file with
      * the reference sequence, a file with reads and an output file path.
      *
-     * @param referenceSequenceFile
-     * @param readsFile
-     * @param outputFile
+     * @param referenceSequenceFile the file containing the reference sequence with file ending
+     * @param readsFile             the file containing the reads with file ending
+     * @param outputFile            the output file without file endings
+     * @param eventHandlerList      a list of handler to be added to the JavaFX Task
      *
      * @throws IOException
      */

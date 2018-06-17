@@ -14,7 +14,7 @@ public class WindowsCommunicator extends OSCommunicator {
     /**
      * Returns the specific Windows shell name.
      *
-     * @return
+     * @return the specific Windows shell name
      */
     @Override
     protected String getShellName( ) {
