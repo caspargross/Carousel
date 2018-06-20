@@ -1,6 +1,8 @@
 package playground;
 
 import com.sun.deploy.uitoolkit.DragContext;
+import com.sun.javafx.geom.transform.Affine3D;
+import com.sun.javafx.geom.transform.BaseTransform;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -14,10 +16,16 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.scene.input.*;
+import javafx.scene.transform.Rotate;
+import javafx.scene.transform.Scale;
+import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
 import jdk.jfr.events.ExceptionThrownEvent;
 import javax.xml.stream.events.Attribute;
 import java.lang.Object;
+import java.util.ArrayList;
+import java.util.List;
+
 import javafx.scene.shape.*;
 
 
@@ -29,13 +37,26 @@ public class HelloWorld extends Application {
         primaryStage.setTitle("Hello World");
         primaryStage.setScene(new Scene(root, 300, 300));
         primaryStage.show();
+
     }
 
 
     public static void main(String[] args) {
         launch(args);
-    }
+}
+    // Stuff for Tickmarks currently still global Variables
+    List<Pane> tickmarkList = new ArrayList<Pane>();
+    List<Scale> scaleList = new ArrayList<Scale>();
+    double oldMousePos;
+    double scaleCount=0;
 
+    //gets a Text of which the user wants to get the CenterCoordinates, returns a COordinate where the user can receive X Y coordinates seperately
+    private Coordinate getCenteredTextCoordinates(Text text){
+        Coordinate temp = new Coordinate();
+        temp.setX(text.getX()+text.getLayoutBounds().getWidth()/2);
+        temp.setY(text.getY()-text.getLayoutBounds().getHeight()/4);        //DONT ASK WHY divided by 4
+        return temp;
+    }
     // Accounts for the Width of a given string in a Text. so that XY coordinates get adjusted and the Object is centered.
     private Text centerTextOnCoordinate( String text, double x, double y )
     {
@@ -46,73 +67,17 @@ public class HelloWorld extends Application {
     }
     //produces an array of lines / tickmarks for a full circle. Radius r, length of the tickmarks l, and degree d between tickmarks is given
     // TODO: Check if Arguments are valid (r > 0, d > 0 < 360, l > 0)
-    private Line[] circleOfTickmarks (double centerX, double centerY, double radius, double length, int degree) {
+    private Line[] circleOfTickmarks (GlobalInformation gInfo, double length, int degree) {
         Line[] lineArray = new Line[360 / degree];
         double tempSX, tempEX, tempSY, tempEY;
         for (int i = 0; i < lineArray.length; i++) {
-            tempSX = centerX+  radius * Math.cos(Math.toRadians(i * degree));
-            tempEX = centerX+ (radius + length) * (Math.cos(Math.toRadians(i * degree)));
-            tempSY = centerY+  radius * (Math.sin(Math.toRadians(i * degree)));
-            tempEY = centerY+ (radius + length) * (Math.sin(Math.toRadians(i * degree)));
+            tempSX = gInfo.getCenter().getX()+  gInfo.getRadius() * Math.cos(Math.toRadians(i * degree));
+            tempEX = gInfo.getCenter().getX()+ (gInfo.getRadius() + length) * (Math.cos(Math.toRadians(i * degree)));
+            tempSY = gInfo.getCenter().getY()+  gInfo.getRadius() * (Math.sin(Math.toRadians(i * degree)));
+            tempEY = gInfo.getCenter().getY()+ (gInfo.getRadius() + length) * (Math.sin(Math.toRadians(i * degree)));
             lineArray[i] = new Line(tempSX, tempSY, tempEX, tempEY);
         }
         return lineArray;
-    }
-
-    // Creates an arc-segment as a path to draw it later on the display. Receives the distance from center r/radius the position of the center, the height of the segment, the length, a start position and a boolean which determines the color depending on the direction of the segment
-    // TODO: propably better to create a arc-segment class consisting of 2 lines and 2 archsegments.
-    // Note: maybe make a class for center coordinates aswell. otherwise way too many argument.
-    // ToDO: currently start = 0 is at 0 degree in polar coordinates = 3´o clock - should be at 0
-    private static Path drawArchsegmentPath(double centerX, double centerY, double radius, double height, double length, double start, boolean direction){
-        //create the 4 Coordinates out of whoom the Path later will be constructed. Point A,B are from the first line, C,D are depending on direction further to 0 or closer
-        double aX,bX,cX,dX,aY,bY,cY,dY;
-        //depeding on direction: length will be positive / negative
-
-        bX = centerX+ radius*Math.cos(Math.toRadians((start/20000)*360));
-        bY = centerY+  radius * (Math.sin(Math.toRadians((start/20000)*360)));
-        aX = centerX+ (radius+height)*Math.cos(Math.toRadians((start/20000)*360));
-        aY = centerY+  (radius+height) * (Math.sin(Math.toRadians((start/20000)*360)));
-        cX = centerX+ radius*Math.cos(Math.toRadians(((start+length)/20000)*360));
-        cY = centerY+  radius * (Math.sin(Math.toRadians(((start+length)/20000)*360)));
-        dX = centerX+ (radius+height)*Math.cos(Math.toRadians(((start+length)/20000)*360));
-        dY = centerY+  (radius+height) * (Math.sin(Math.toRadians(((start+length)/20000)*360)));
-
-        // since arcs behaved weirdly when traversing from B to C (inward bow) with fix1 + fix 2 we travel with "the cursor" to C so we can co from C to B with an arc + continue afterwards from C to D
-        Path temp = new Path();
-        MoveTo moveTo = new MoveTo();
-        moveTo.setX(aX);
-        moveTo.setY(aY);
-        temp.getElements().add(moveTo);
-        LineTo firstLine = new LineTo();
-        firstLine.setX(bX);
-        firstLine.setY(bY);
-        temp.getElements().add(firstLine);
-        MoveTo fix1 = new MoveTo();
-        fix1.setX(cX);
-        fix1.setY(cY);
-        temp.getElements().add(fix1);
-        ArcTo outerArc = new ArcTo();
-        outerArc.setX(bX);
-        outerArc.setY(bY);
-        outerArc.setRadiusX(150);
-        outerArc.setRadiusY(150);
-        temp.getElements().add(outerArc);
-        MoveTo fix2 = new MoveTo();
-        fix2.setX(cX);
-        fix2.setY(cY);
-        temp.getElements().add(fix2);
-        LineTo secondLine = new LineTo();
-        secondLine.setX(dX);
-        secondLine.setY(dY);
-        temp.getElements().add(secondLine);
-        ArcTo innerArc = new ArcTo();
-        innerArc.setX(aX);
-        innerArc.setY(aY);
-        innerArc.setRadiusX(150);
-        innerArc.setRadiusY(150);
-        temp.getElements().add(innerArc);
-        return temp;
-
     }
 
     private Pane createHelloWorld() {
@@ -123,100 +88,7 @@ public class HelloWorld extends Application {
         myCircle.setStroke(Color.DARKBLUE);
         myPane.getChildren().add(myCircle);
 
-        // Add special tickmars + Labels to display
-        Line line0 = new Line(150,40,150,50);
-        myPane.getChildren().add(line0);
-        Text line0Text = centerTextOnCoordinate("15",150,60);
-        myPane.getChildren().add(line0Text);
 
-        Line line5 = new Line(260,150,250,150);
-        myPane.getChildren().add(line5);
-        Text line5Text = centerTextOnCoordinate("0",240,150);
-        myPane.getChildren().add(line5Text);
-
-        Line line10 = new Line(150,250,150,260);
-        myPane.getChildren().add(line10);
-        Text line10Text = centerTextOnCoordinate("5",150,240);
-        myPane.getChildren().add(line10Text);
-
-        Line line15 = new Line(50,150,40,150);
-        myPane.getChildren().add(line15);
-        Text line15Text = centerTextOnCoordinate("10",60,150);
-        myPane.getChildren().add(line15Text);
-
-
-        // use the tickmark FUnction to generate an Array of lines, and add them to the Pane
-        Line[] tickmarkArray = circleOfTickmarks(150,150, 100,5,10);
-        for(int i = 0; i < tickmarkArray.length; i++){
-            myPane.getChildren().add(tickmarkArray[i]);
-        }
-        /*
-        // test of the drawArchsegement section. Note: currently the different levels of segments are determined by the radius. Later on a "level" could simply be used as an attribute to determine on which layer of the circles the segment should be drawn onto
-        Path test = drawArchsegmentPath(150,150,150,10,2000,5000,true);
-        test.setStroke(Color.GREEN);
-        myPane.getChildren().add(test);
-        Path test3 = drawArchsegmentPath(150,150,140,10,1000,5000,true);
-        test3.setStroke(Color.RED);
-        myPane.getChildren().add(test3);
-        Path test2 = drawArchsegmentPath(150,150,150,10,2000,1000,false);
-        myPane.getChildren().add(test2);
-
-        Arc testarc = new Arc(150,150,110,110,45,270);
-        testarc.setType(ArcType.OPEN);
-        testarc.setFill(Color.TRANSPARENT);
-        testarc.setStroke(Color.BLACK);
-        myPane.getChildren().add(testarc);
-
-        Arc arcOpen = new Arc();
-        arcOpen.setCenterX(150.0f);
-        arcOpen.setCenterY(150.0f);
-        arcOpen.setRadiusX(25.0f);
-        arcOpen.setRadiusY(25.0f);
-        arcOpen.setStartAngle(45.0f);
-        arcOpen.setLength(270.0f);
-        arcOpen.setType(ArcType.OPEN);
-        arcOpen.setStroke(Color.BLACK);
-        arcOpen.setFill(Color.TRANSPARENT);
-        myPane.getChildren().add(arcOpen);
-        */
-
-        //Mouse-Drag to Rotate stuff
-        Point3D tempPoint= new Point3D(0,0,150);
-        myPane.setOnMouseDragged(new EventHandler<MouseEvent>() {
-            @Override
-            public void handle(MouseEvent event) {
-                myPane.setRotationAxis(tempPoint);
-                double tempScaleX =myPane.getScaleX();
-                double tempScaleY = myPane.getScaleY();
-                myPane.setScaleX(1);
-                myPane.setScaleY(1);
-                myPane.setRotate(event.getSceneX());
-                myPane.setScaleX(tempScaleX);
-                myPane.setScaleY(tempScaleY);
-            }
-        });
-
-        //Mouse-Zoom to Zoom Note only DeltaY is relevant (vertical scroll amount)
-
-        myPane.setOnScroll(new EventHandler<ScrollEvent>() {
-            @Override
-            public void handle(ScrollEvent event) {
-                //Divide in 2 Cases: getDeltaY is negative (downscroll) and getDeltaY is positive (upscroll)
-                if(event.getDeltaY()>0){
-                    myPane.setScaleX(myPane.getScaleX()*1.5);
-                    myPane.setScaleY(myPane.getScaleY()*1.25);
-
-                }
-                if(event.getDeltaY()<0 && myPane.getScaleY()>0.6){
-                    myPane.setScaleX(myPane.getScaleX()*(1/(1.5)));
-                    myPane.setScaleY(myPane.getScaleY()*(1/(1.25)));
-                    System.out.println(myPane.getScaleY());
-
-                }
-
-                System.out.println(event.getDeltaY()*1/40);
-            }
-        });
 
 
         //TEST READ ARRAY
@@ -239,44 +111,138 @@ public class HelloWorld extends Application {
         Coordinate center = new Coordinate(150,150);
         GlobalInformation gInfo = new GlobalInformation(center,100,10,20000);
         //CIRCULAR VIEW
-        /*CircularView demo = new CircularView(readArray,gInfo,levelArray);
+        CircularView demo = new CircularView(readArray,gInfo,levelArray);
         ReadView[] temp = demo.getReadViews();
         for(int i = 0; i < demo.getReadViews().length;i++){
-            myPane.getChildren().add(temp[i].getArchSegment().getInner());
-            myPane.getChildren().add(temp[i].getArchSegment().getOuter());
-            myPane.getChildren().add(temp[i].getArchSegment().getStart());
-            myPane.getChildren().add(temp[i].getArchSegment().getStop());
-        }*/
-        //READVIEW TEST
-
-        ReadView testRead = new ReadView(readArray[1],gInfo,levelArray[1]);
-        myPane.getChildren().add(testRead.getArchSegment().getInner());
-        myPane.getChildren().add(testRead.getArchSegment().getOuter());
-        myPane.getChildren().add(testRead.getArchSegment().getStart());
-        myPane.getChildren().add(testRead.getArchSegment().getStop());
-        ReadView testRead2 = new ReadView(readArray[0],gInfo,levelArray[0]);
-        myPane.getChildren().add(testRead2.getArchSegment().getInner());
-        myPane.getChildren().add(testRead2.getArchSegment().getOuter());
-        myPane.getChildren().add(testRead2.getArchSegment().getStart());
-        myPane.getChildren().add(testRead2.getArchSegment().getStop());
-        ReadView testRead4 = new ReadView(readArray[4],gInfo,levelArray[4]);
-        myPane.getChildren().add(testRead4.getArchSegment().getInner());
-        myPane.getChildren().add(testRead4.getArchSegment().getOuter());
-        myPane.getChildren().add(testRead4.getArchSegment().getStart());
-        myPane.getChildren().add(testRead4.getArchSegment().getStop());
-        ReadView testRead5 = new ReadView(readArray[5],gInfo,levelArray[5]);
-        myPane.getChildren().add(testRead5.getArchSegment().getInner());
-        myPane.getChildren().add(testRead5.getArchSegment().getOuter());
-        myPane.getChildren().add(testRead5.getArchSegment().getStart());
-        myPane.getChildren().add(testRead5.getArchSegment().getStop());
+            myPane.getChildren().addAll(temp[i].getArchSegment().getInner(),temp[i].getArchSegment().getOuter(),temp[i].getArchSegment().getStart(),temp[i].getArchSegment().getStop());
+        }
 
 
+        // Add special tickmars + Labels to display
+        Line line15 = new Line(150,40,150,50);
+        Text line15Text = centerTextOnCoordinate("15",150,60);
+        Line line0 = new Line(260,150,250,150);
+        Text line0Text = centerTextOnCoordinate("0",240,150);
+        Line line5 = new Line(150,250,150,260);
+        Text line5Text = centerTextOnCoordinate("5",150,240);
+        Line line10 = new Line(50,150,40,150);
+        Text line10Text = centerTextOnCoordinate("10",60,150);
+
+        myPane.getChildren().addAll(line0,line5,line5Text,line10,line10Text,line15,line15Text);
 
 
+        // use the tickmark FUnction to generate an Array of lines, and add them to the Pane
+        Line[] tickmarkArray = circleOfTickmarks(gInfo,10,18);
+        for(int i = 0; i < tickmarkArray.length; i++){
+            myPane.getChildren().add(tickmarkArray[i]);
+        }
+
+
+        //Mouse-Drag to Rotate stuff
+        Pane label0Pane = new Pane();
+        Pane label5Pane = new Pane();
+        Pane label10Pane = new Pane();
+        Pane label15Pane = new Pane();
+
+        //This is to make sure, that when a completely new MouseDrag happens our circle doesnt wildy jump around because oldMousePos is 0
+        myPane.setOnMouseMoved(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                oldMousePos = event.getSceneX();
+            }
+        });
+        myPane.setOnMouseDragged(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+
+
+                Rotate rotate = new Rotate();
+                rotate.setAngle((event.getSceneX()-oldMousePos));
+                rotate.setPivotX(150);
+                rotate.setPivotY(150);
+                myPane.getTransforms().add(rotate);
+                gInfo.setRotation(gInfo.getRotation()+rotate.getAngle());
+                Rotate rotate0 = new Rotate((-(event.getSceneX()-oldMousePos)),getCenteredTextCoordinates(line0Text).getX(),getCenteredTextCoordinates(line0Text).getY());
+                Rotate rotate5 = new Rotate((-(event.getSceneX()-oldMousePos)),getCenteredTextCoordinates(line5Text).getX(),getCenteredTextCoordinates(line5Text).getY());
+                Rotate rotate10 = new Rotate((-(event.getSceneX()-oldMousePos)),getCenteredTextCoordinates(line10Text).getX(),getCenteredTextCoordinates(line10Text).getY());
+                Rotate rotate15 = new Rotate((-(event.getSceneX()-oldMousePos)),getCenteredTextCoordinates(line15Text).getX(),getCenteredTextCoordinates(line15Text).getX());
+                label0Pane.getTransforms().add(rotate0);
+                label5Pane.getTransforms().add(rotate5);
+                label10Pane.getTransforms().add(rotate10);
+                label15Pane.getTransforms().add(rotate15);
+                System.out.println("current gInfo rotation"+ gInfo.getRotation());
+                oldMousePos = event.getSceneX();
+            }
+        });
+        label0Pane.getChildren().add(line0Text);
+        label5Pane.getChildren().add(line5Text);
+        label10Pane.getChildren().add(line10Text);
+        label15Pane.getChildren().add(line15Text);
+        myPane.getChildren().addAll(label0Pane,label5Pane,label10Pane,label15Pane);
+
+        //Mouse-Zoom to Zoom Note only DeltaY is relevant (vertical scroll amount)
+
+        myPane.setOnScroll(new EventHandler<ScrollEvent>() {
+            @Override
+            public void handle(ScrollEvent event) {
+                //Divide in 2 Cases: getDeltaY is negative (downscroll) and getDeltaY is positive (upscroll)
+
+                //depending on Zoom-factor the ticklines need to be at a shorter length + a smaller degree amount
+
+
+
+                //Create a Scale, to transform
+                //Depending on Rotation we want to zoom into a different Point.
+                //TODO: This is propably the moment where i should´ve creted a helper function for the whole cartesian -> polar coordinate calculation.. - Maybe still do it
+                double xtemp = (gInfo.getCenter().getX()+(((gInfo.getRadius()+5))*Math.cos(Math.toRadians(gInfo.getRotation()+90))));
+                double ytemp = gInfo.getCenter().getY()+((gInfo.getRadius())+5)*-Math.sin(Math.toRadians(gInfo.getRotation()+90));
+                Scale Zoom = new Scale(1.5,1.5, xtemp,ytemp);
+
+                if(event.getDeltaY()>0){
+                    scaleList.add(Zoom);
+
+                    myPane.getTransforms().add(Zoom);
+                    System.out.println(myPane.getTransforms().toString());
+                    System.out.println(gInfo.getRotation());
+                    System.out.println("X: "+xtemp + " Y: " + ytemp );
+
+                    Pane tempPane = new Pane();
+                    scaleCount++;
+                    Line[] tempLineArray = circleOfTickmarks(gInfo,10/(1.5*scaleCount),(int) (18/(1.5*scaleCount)));
+                    for(int i = 0; i < tempLineArray.length;i++){
+                        tempPane.getChildren().add(tempLineArray[i]);
+                    }
+                    tickmarkList.add(tempPane);
+                    myPane.getChildren().add(tempPane);
+
+                }
+                if(event.getDeltaY()<0 && scaleCount>0){
+                    /*try {
+                        //myPane.getTransforms().add(Zoom.createInverse());
+                        //System.out.println(myPane.getTransforms().toString());
+                    }
+                    catch (Exception exc){
+                            System.out.println("Inverse scale could not be created"); // THIS SHOULD NEVER HAPPEN - the given scale is hardcoded & inversible
+                    }*/
+                    scaleCount--;
+                    //removes 1 pane of tickmarks, since we no  longer are zoomed in this far
+                    myPane.getChildren().remove(tickmarkList.get(tickmarkList.size()-1));
+                    tickmarkList.remove(tickmarkList.size()-1);
+                    //removes 1 scale element since we zoomed out
+                    myPane.getTransforms().remove(scaleList.get(scaleList.size()-1));
+                    scaleList.remove(scaleList.get(scaleList.size()-1));
+                }
+
+                System.out.println(event.getDeltaY()*1/40);
+            }
+        });
+        System.out.println(line0Text.getX()+" "+ line0Text.getLayoutBounds().getWidth()+" "+line0Text.getY() + " "+line0Text.getLayoutBounds().getHeight());
+        System.out.println(line5Text.getX()+" "+ line5Text.getLayoutBounds().getWidth()+" "+line5Text.getY() + " "+line5Text.getLayoutBounds().getHeight());
+        System.out.println(line10Text.getX()+" "+ line10Text.getLayoutBounds().getWidth()+" "+line10Text.getY() + " "+line10Text.getLayoutBounds().getHeight());
+        System.out.println(line15Text.getX()+" "+ line15Text.getLayoutBounds().getWidth()+" "+line15Text.getY() + " "+line15Text.getLayoutBounds().getHeight());
+
+        //myPane.setRotate(-90.0);        // To make sure 0 is at the Top
         return myPane;
-
-
-
 
     }
 }
