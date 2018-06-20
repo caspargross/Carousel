@@ -9,13 +9,9 @@ public class CircularView {
     private GlobalInformation info;
     //CONSTRUCTOR
     public CircularView (Read[] readArray,GlobalInformation info, DoubleProperty[] levelArray ){
-        this.info.setCenter(info.getCenter());
-        this.info.setGlobalLength(info.getGlobalLength());
-        this.info.setHeight(info.getHeight());
-        this.info.setRadius(info.getRadius());
-        this.levelArray = levelArray;
-
+        this.info = new GlobalInformation(info.getCenter(),info.getRadius(),info.getHeight(),info.getGlobalLength());
         // Fill the Array of readViews
+        readViews = new ReadView[readArray.length];
         for (int i = 0; i < readArray.length;i++) {
             readViews[i] = new ReadView(readArray[i],this.info, levelArray[i]);
         }

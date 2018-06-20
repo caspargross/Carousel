@@ -170,7 +170,6 @@ public class HelloWorld extends Application {
                 label5Pane.getTransforms().add(rotate5);
                 label10Pane.getTransforms().add(rotate10);
                 label15Pane.getTransforms().add(rotate15);
-                System.out.println("current gInfo rotation"+ gInfo.getRotation());
                 oldMousePos = event.getSceneX();
             }
         });
@@ -200,12 +199,7 @@ public class HelloWorld extends Application {
 
                 if(event.getDeltaY()>0){
                     scaleList.add(Zoom);
-
                     myPane.getTransforms().add(Zoom);
-                    System.out.println(myPane.getTransforms().toString());
-                    System.out.println(gInfo.getRotation());
-                    System.out.println("X: "+xtemp + " Y: " + ytemp );
-
                     Pane tempPane = new Pane();
                     scaleCount++;
                     Line[] tempLineArray = circleOfTickmarks(gInfo,10/(1.5*scaleCount),(int) (18/(1.5*scaleCount)));
@@ -232,15 +226,8 @@ public class HelloWorld extends Application {
                     myPane.getTransforms().remove(scaleList.get(scaleList.size()-1));
                     scaleList.remove(scaleList.get(scaleList.size()-1));
                 }
-
-                System.out.println(event.getDeltaY()*1/40);
             }
         });
-        System.out.println(line0Text.getX()+" "+ line0Text.getLayoutBounds().getWidth()+" "+line0Text.getY() + " "+line0Text.getLayoutBounds().getHeight());
-        System.out.println(line5Text.getX()+" "+ line5Text.getLayoutBounds().getWidth()+" "+line5Text.getY() + " "+line5Text.getLayoutBounds().getHeight());
-        System.out.println(line10Text.getX()+" "+ line10Text.getLayoutBounds().getWidth()+" "+line10Text.getY() + " "+line10Text.getLayoutBounds().getHeight());
-        System.out.println(line15Text.getX()+" "+ line15Text.getLayoutBounds().getWidth()+" "+line15Text.getY() + " "+line15Text.getLayoutBounds().getHeight());
-
         //myPane.setRotate(-90.0);        // To make sure 0 is at the Top
         return myPane;
 

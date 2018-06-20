@@ -17,10 +17,10 @@ public class ArchSegment {
     public ArchSegment(Read read, GlobalInformation info,DoubleProperty Level){
         //do Math to create Points A,B,C,D.
         //Convention: if direction is true (clockwise) the created ArchSegment looks like this:
-        //              B
-        //                                      D
-        //           A
-        //                                  C
+        //              B-  -   -   _   _
+        //            /                      -    -  D
+        //           A  -      -    _               /
+        //                               -     -  C
         // if direction is false Line CD is left from AD
         DoubleProperty radius = new SimpleDoubleProperty();
         radius.bind(Level.multiply(info.getHeight()).add(info.getRadius()));

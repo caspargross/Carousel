@@ -5,6 +5,9 @@ public class GlobalInformation {
     private double radius;
     private double height;
     private double globalLength;
+    private double rotation = 0.0; //TODO: Currently rotation for the Scroll-calculation is in Globalinformation. This is only used for the main so it should go back to as a global variable?
+
+
 
 
     //CONSTRUCTOR
@@ -14,6 +17,7 @@ public class GlobalInformation {
         this.height=height;
         this.globalLength = globalLength;
     }
+
 
     //GETTER
     public Coordinate getCenter(){
@@ -32,6 +36,11 @@ public class GlobalInformation {
         return radius;
     }
 
+    public double getRotation() {
+        return rotation;
+    }
+
+
     //SETTER
 
     public void setCenter(Coordinate center) {
@@ -48,6 +57,10 @@ public class GlobalInformation {
 
     public void setRadius(double radius) {
         this.radius = radius;
+    }
+
+    public void setRotation(double rotation) {
+        this.rotation = rotation;
     }
 
 }
