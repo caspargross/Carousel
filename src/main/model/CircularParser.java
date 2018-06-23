@@ -122,7 +122,7 @@ public class CircularParser {
      * @return the Read representation of the read
      */
     private static Read createNewReadFromSAMRecord( SAMRecord record ) {
-        return new Read( record.getReadName( ), record.getAlignmentStart( ), record.getAlignmentEnd( ), record.getReadString( ), record.getCigar( ) );
+        return new Read( record.getReadName( ), record.getAlignmentStart( ), record.getAlignmentEnd( ), record.getReadNegativeStrandFlag( ), record.getReadString( ), record.getCigar( ) );
     }
 
 }

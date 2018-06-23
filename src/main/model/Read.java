@@ -75,6 +75,22 @@ public class Read {
         this.alignmentEnd = alignmentEnd;
     }
 
+
+    /**
+     * A boolean flag determining whether the read was reversely read off.
+     */
+    private boolean negativeStrandFlag;
+
+    /**
+     * Returns Read.negativeStrandFlag.
+     *
+     * @return Read.negativeStrandFlag.
+     */
+    public boolean getNegativeStrandFlag( ) {
+        return negativeStrandFlag;
+    }
+
+
     /**
      * The sequence of the Read as stored in the BAM file (therefore, for example hard clipped bases are missing).
      */
@@ -132,13 +148,25 @@ public class Read {
      * @param sequence
      * @param cigar
      */
-    public Read( String name, int alignmentStart, int alignmentEnd, String sequence, Cigar cigar ) {
+    public Read( String name, int alignmentStart, int alignmentEnd, boolean negativeStrandFlag, String sequence, Cigar cigar ) {
         this.name = name;
         this.alignmentStart = alignmentStart;
         this.alignmentEnd = alignmentEnd;
+        this.negativeStrandFlag = negativeStrandFlag;
         this.sequence = sequence;
         this.cigar = cigar;
     }
+
+
+    /**
+     * Returns the length of the alignment between the read and the reference sequence.
+     *
+     * @return the length of the alignment between the read and the reference sequenc
+     */
+    public int getAlignmentLength( ) {
+        return this.alignmentEnd - this.alignmentStart + 1;
+    }
+
 
     /**
      * Checks whether the Read is circular and returns this information as a boolean.

@@ -5,6 +5,7 @@
 package main.model.os_related;
 
 import main.model.os_related.os_communicator.LinuxCommunicator;
+import main.model.os_related.os_communicator.MacCommunicator;
 import main.model.os_related.os_communicator.OSCommunicator;
 import main.model.os_related.os_communicator.WindowsCommunicator;
 
@@ -22,6 +23,7 @@ public class OSGateway {
     public enum OSType {
         Windows,
         Linux,
+        Mac,
         Unknown
     }
 
@@ -45,9 +47,14 @@ public class OSGateway {
      * Returns OSCommunicator.osCommunicator.
      *
      * @return OSCommunicator.osCommunicator
+     *
+     * @throws Exception
      */
-    public static OSCommunicator getCommunicator( ) {
-        return osCommunicator;
+    public static OSCommunicator getCommunicator( ) throws Exception {
+        if( osCommunicator == null )
+            throw new Exception( "Either no OSCommunicator is available for the OS used or the detection failed." );
+        else
+            return osCommunicator;
     }
 
     /**
@@ -64,10 +71,12 @@ public class OSGateway {
      */
     private static void determineOS( ) {
         String osName = System.getProperty( "os.name" );
-        if( osName.contains( "Windows" ) )
-            osType = OSType.Windows;
-        else if( osName.contains( "Linux" ) )
+        if( osName.contains( "Linux" ) )
             osType = OSType.Linux;
+        else if( osName.contains( "Mac" ) )
+            osType = OSType.Mac;
+        else if( osName.contains( "Windows" ) )
+            osType = OSType.Windows;
         else
             osType = osType.Unknown;
         return;
@@ -82,6 +91,10 @@ public class OSGateway {
         switch( osType ) {
             case Linux:
                 osCommunicator = new LinuxCommunicator( );
+                break;
+
+            case Mac:
+                osCommunicator = new MacCommunicator( );
                 break;
 
             case Windows:
