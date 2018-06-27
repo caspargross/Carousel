@@ -160,7 +160,7 @@ public class Read {
 
     /**
      * Returns the length of the alignment between the read and the reference sequence.
-     *
+     * Useless if read is circular!
      * @return the length of the alignment between the read and the reference sequenc
      */
     public int getAlignmentLength( ) {

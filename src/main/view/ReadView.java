@@ -1,8 +1,8 @@
-package playground;
+package main.view;
 
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import main.model.Read;
+
 public class ReadView {
 
 
@@ -14,7 +14,7 @@ public class ReadView {
     private GlobalInformation info;
 
 
-    public ReadView(Read read, GlobalInformation info,DoubleProperty level){
+    public ReadView(Read read, GlobalInformation info,int level){
         this.read = read;
        /* this.info.setCenter(info.getCenter());
         this.info.setGlobalLength(info.getGlobalLength());

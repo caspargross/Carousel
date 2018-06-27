@@ -1,4 +1,6 @@
-package playground;
+package main.view;
+
+import playground.Coordinate;
 
 public class GlobalInformation {
     private Coordinate center;
@@ -9,7 +11,7 @@ public class GlobalInformation {
 
 
 
-
+    //TODO: Constructor right now needs a lot of inputs, that can be easily calculated from a given referenceLength(global Length). Can´t be changed right now because Standard Zoom is still WIP
     //CONSTRUCTOR
     public GlobalInformation(Coordinate center, double radius, double height, double globalLength){
         this.center = center;

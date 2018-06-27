@@ -1,15 +1,10 @@
 package playground;
 
-import com.sun.deploy.uitoolkit.DragContext;
-import com.sun.javafx.geom.transform.Affine3D;
-import com.sun.javafx.geom.transform.BaseTransform;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.event.EventHandler;
-import javafx.geometry.Point3D;
 import javafx.scene.Scene;
-import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -18,15 +13,14 @@ import javafx.scene.text.Text;
 import javafx.scene.input.*;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
-import javafx.scene.transform.Transform;
 import javafx.stage.Stage;
-import jdk.jfr.events.ExceptionThrownEvent;
-import javax.xml.stream.events.Attribute;
-import java.lang.Object;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.scene.shape.*;
+import main.view.CircularView;
+import main.view.GlobalInformation;
+import main.view.ReadView;
 
 
 public class HelloWorld extends Application {

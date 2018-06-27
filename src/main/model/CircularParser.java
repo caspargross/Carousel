@@ -125,4 +125,18 @@ public class CircularParser {
         return new Read( record.getReadName( ), record.getAlignmentStart( ), record.getAlignmentEnd( ), record.getReadNegativeStrandFlag( ), record.getReadString( ), record.getCigar( ) );
     }
 
+    /**
+     * Extracted Code from the parseBamFile function for use in globalInformation.
+     * NOTE: might be a duplicate of a diffferent function, didnt find it
+     * @author Felix
+     * @param  bamFile
+     * @return the referenceLength of the given File
+     *
+     */
+
+    public static  Long getReferenceLength(File bamFile){
+        SamReader reader = SamReaderFactory.makeDefault( ).open( bamFile );
+        final long referenceLength = reader.getFileHeader( ).getSequenceDictionary( ).getReferenceLength( );
+        return referenceLength;
+    }
 }
