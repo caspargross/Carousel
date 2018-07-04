@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.chart.BarChart?>
+<?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.paint.Color?>
+<?import javafx.scene.text.Font?>
+
+<VBox prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
+<children>
+    <MenuBar VBox.vgrow="NEVER">
+        <menus>
+            <Menu mnemonicParsing="false" text="Input">
+                <items>
+                    <Menu mnemonicParsing="false" text="Open Bam/Sam Files">
+                        <items>
+                            <MenuItem mnemonicParsing="false" text="File Chooser SAM/BA" />
+                            <MenuItem mnemonicParsing="false" text="File Chooser Fasta" />
+
+                        </items>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Map Reads">
+                        <items>
+                            <MenuItem mnemonicParsing="false" text="File Chooser References" />
+                        </items>
+                    </Menu>
+                    <Menu mnemonicParsing="false" text="Export Image">
+                        <items>
+                            <MenuItem mnemonicParsing="false" text="PNG (current view) " />
+                        </items>
+                    </Menu>
+
+                </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Select">
+                <items>
+                    <MenuItem mnemonicParsing="false" text="Select by range" />
+                    <MenuItem mnemonicParsing="false" text="Blast Sequence" />
+                    <MenuItem mnemonicParsing="false" text="Open Statistics View" />
+                    <MenuItem mnemonicParsing="false" text="Copy Sequence to Clipboard" />
+                </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="View">
+                <items>
+                    <MenuItem mnemonicParsing="false" text="Open Last Blast" />
+                    <MenuItem mnemonicParsing="false" text="Export Image" />
+
+                </items>
+            </Menu>
+        </menus>
+    </MenuBar>
+      
+    <SplitPane dividerPositions="0.2505567928730512, 0.7505567928730512" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+        <items>
+            <AnchorPane>
+                <children>
+                    <Label alignment="CENTER" layoutX="65.0" layoutY="14.0" minWidth="60.0" prefWidth="-1.0" style="&#10;" text="Contig List" textAlignment="CENTER" wrapText="false">
+                        <font>
+                            <Font size="18.0" fx:id="x1" />
+                        </font>
+                        <textFill>
+                            <Color blue="0.624" green="0.624" red="0.624" fx:id="x2" />
+                        </textFill>
+                    </Label>
+                  <ScrollPane layoutX="5.0" layoutY="89.0" prefHeight="500" prefWidth="200.0">
+                     <content>
+                        <ListView prefHeight="500" prefWidth="200.0"  editable="true">
+                            <items>
+
+                            </items>
+                        </ListView>
+                     </content>
+                  </ScrollPane>
+                </children>
+            </AnchorPane>
+            <ScrollPane prefHeight="-1.0" prefWidth="-1.0">
+                <content>
+                    <AnchorPane id="Content" minHeight="-1.0" minWidth="-1.0" prefHeight="545.0" prefWidth="430.0">
+                        <children>
+                            <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="View" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+                            <BarChart layoutX="-9.0" layoutY="161.0" prefHeight="384.0" prefWidth="465.0">
+                                <xAxis>
+                                    <CategoryAxis side="BOTTOM" />
+                                </xAxis>
+                                <yAxis>
+                                    <NumberAxis side="LEFT" />
+                                </yAxis>
+                            </BarChart>
+                            <ProgressBar layoutX="4.0" layoutY="77.0" prefWidth="200.0" progress="0.0" />
+                        </children>
+                    </AnchorPane>
+                </content>
+            </ScrollPane>
+            <AnchorPane>
+                <children>
+                    <Label alignment="CENTER" font="$x1" layoutX="14.0" layoutY="14.0" style="&#10;" text="Details" textAlignment="CENTER" textFill="$x2" wrapText="false" />
+                </children>
+            </AnchorPane>
+        </items>
+    </SplitPane>
+    <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
+        <children>
+            <Label maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Program Status" HBox.hgrow="ALWAYS">
+                <font>
+                    <Font size="11.0" fx:id="x3" />
+                </font>
+                <textFill>
+                    <Color blue="0.625" green="0.625" red="0.625" fx:id="x4" />
+                </textFill>
+            </Label>
+            <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS">
+               <children>
+                  <Label layoutX="34.0" layoutY="4.0" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="File Name">
+                     <font>
+                        <Font size="11.0" fx:id="x31" />
+                     </font>
+                     <textFill>
+                        <Color blue="0.625" green="0.625" red="0.625" fx:id="x41" />
+                     </textFill>
+                  </Label>
+                  <Label layoutX="115.0" layoutY="3.0" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="Total Length">
+                     <font>
+                        <Font size="11.0" fx:id="x32" />
+                     </font>
+                     <textFill>
+                        <Color blue="0.625" green="0.625" red="0.625" fx:id="x42" />
+                     </textFill>
+                  </Label>
+               </children></Pane>
+            <Label font="$x3" maxWidth="-1.0" text="Mouse Position" textFill="$x4" HBox.hgrow="NEVER" />
+        </children>
+        <padding>
+            <Insets bottom="3.0" left="3.0" right="3.0" top="3.0" />
+        </padding>
+    </HBox>
+</children>
+</VBox>
