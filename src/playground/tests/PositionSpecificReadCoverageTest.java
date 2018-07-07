@@ -22,10 +22,10 @@ import java.io.File;
 public class PositionSpecificReadCoverageTest extends Application {
 
     /**
-     * The BAM file to test.
+     * The BAM file to test. If necessary, feel free to adjust it to fit your needs.
      */
-    //private final File BAMFileToTest = new File( "./data/p7_mapped.bam" );
-    private final File BAMFileToTest = new File( "../NoDropbox/Test/p7_mapped.bam" );
+    private final File BAMFileToTest = new File( "./data/p7_mapped.bam" );
+
 
     /**
      * The start and end indexes of the section of the PSCR to show.

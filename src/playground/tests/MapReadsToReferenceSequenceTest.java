@@ -24,11 +24,11 @@ import java.util.ArrayList;
 public class MapReadsToReferenceSequenceTest {
 
     /**
-     * The files to be used in the test. Please adjust them to fit your needs.
+     * The files to be used in the test. If necessary, feel free to adjust them to fit your needs.
      */
-    private static File referenceSequenceFile = new File( "reference.fasta" ),
-            readsFile = new File( "reads.fastq" ),
-            outputFile = new File( "out" ); // Please note that outputFile should not contain a file ending, since these will be added by the method, because two files with different file endings, .bam and .bai, will be created.
+    private static File referenceSequenceFile = new File( "./data/p7_ref.fasta" ),
+            readsFile = new File( "./data/reads.fastq" ),
+            outputFile = new File( "result" ); // Please note that outputFile should not contain a file ending, since these will be added by the method, because two files with different file endings, .bam and .bai, will be created.
 
 
     /**
