@@ -23,7 +23,7 @@ public class PSRCBarChart {
     /**
      * Creates a BartChart to show a certain section of the PSRC provided by the model.
      *
-     * @param startIndex the start index of the section to show, inclusive
+     * @param startIndex the start index of the section to show, inclusive (0 = first base!)
      * @param endIndex   the end index of the section to show, inclusive
      *
      * @return a new BartChart object for the GUI

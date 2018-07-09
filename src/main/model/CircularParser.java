@@ -53,13 +53,16 @@ public class CircularParser {
 
         /**
          * A list of lists of Read objects which I came up with to help the view to visually align the reads onto the
-         * circular reference sequence more easily.
+         * circular reference sequence more easily. The fact that this structure contains many empty lists is knowingly
+         * tolerated, because making the algorithm quicker is more valuable than saving space. Especially for this
+         * reason, e.g. a SortedMap was not chosen.
          * <p>
-         * You can run CircularParserTest.printReadsSorted( ) which visualizes the structure to get a quick idea of how
-         * it is defined.
+         * You can run the printReadsSorted test in CircularParserTest which visualizes the structure to get a quick
+         * idea of how it is defined.
          * <p>
-         * The first list consists of Read objects grouped into Lists such that all Read objects in a List have the same
-         * alignment start value. The sub lists are then ordered by the Read object's lengths in descending order.
+         * The list contains lists of Read objects such that the indices of the outer list correspond with the alignment
+         * start values of the Read objects contained in an inner list. The Read objects in an inner lists are ordered
+         * by their alignment lengths in descending order.
          * <p>
          * More formally: Let
          * <p>
@@ -71,8 +74,8 @@ public class CircularParser {
          * <p>
          * Then, the sorted structure can be defined as follows:
          * <p>
-         * [ ( i < k ) => ( Read( i, j ).getAlignmentStart( ) < Read( k, l ).getAlignmentStart( ) ) ] for all i, k in
-         * Indices( CircularParser.Reads.Shown ) and j in Indices( List( i ) ) and l in Indices( List( k ) )
+         * [ Read( i, j ).getAlignmentStart( ) = i + 1 ] for all i in Indices( CircularParser.Reads.Shown ) and j in
+         * Indices( List( i ) )
          * <p>
          * and
          * </p>
@@ -103,17 +106,16 @@ public class CircularParser {
             /*
              Insert all Read object into the sub lists without order and sort all sub lists afterwards.
              Always directly inserting a Read at its current proper position potentially requires multiple array shifts of the internal array of the array lists, therefore sorting the sub lists once at the end is better.
-             */
-            int currentAlignmentPosition = 0; // No Read object starts at position 0 (due to the 1-based coordinate system), therefore this ensures that the first Read object will determine the first alignment position.
+            */
             for( Read readToInsert : Reads.Shown ) {
-                if( readToInsert.getAlignmentStart( ) != currentAlignmentPosition ) { // No more Read objects start at currentAlignmentPosition.
+                while( newSorted.size( ) < readToInsert.getAlignmentStart( ) ) // Add new ArrayList objects if necessary.
                     newSorted.add( new ArrayList< Read >( ) );
-                    currentAlignmentPosition = readToInsert.getAlignmentStart( );
-                }
-                newSorted.get( newSorted.size( ) - 1 ).add( readToInsert );
+                newSorted.get( readToInsert.getAlignmentStart( ) - 1 ).add( readToInsert );
             }
             for( List< Read > readList : newSorted ) // Sort all sub lists.
                 Collections.sort( readList, Order.AlignmentLength.reversed( ) );
+            while( newSorted.size( ) < referenceSequenceLength ) // Fill up until the size is referenceSequenceLength if necessary.
+                newSorted.add( new ArrayList< Read >( ) );
             Sorted.setAll( newSorted ); // Assign everything at once so that the listener triggers only once.
             return;
         }
@@ -153,7 +155,7 @@ public class CircularParser {
              * readA and readB are either both cross-border or both not cross-border and readA.getRandomID( ) <
              * readB.getRandomID( ) holds.
              */
-            public final static Comparator< Read > CrossBorderThenRandom = ( Read readOne, Read readTwo ) -> readOne.isCrossBorder( ) ^ readTwo.isCrossBorder( ) ? ( readOne.isCrossBorder( ) ? -1 : 1 ) : ( readOne.getRandomID( ) < readTwo.getRandomID( ) ? -1 : 1 ); // No need to return 0 at any point, because by definition there will never be equal objects in this order.
+            public final static Comparator< Read > CrossBorderBeforeRandom = ( Read readOne, Read readTwo ) -> readOne.isCrossBorder( ) ^ readTwo.isCrossBorder( ) ? ( readOne.isCrossBorder( ) ? -1 : 1 ) : ( readOne.getRandomID( ) < readTwo.getRandomID( ) ? -1 : 1 ); // No need to return 0 at any point, because by definition there will never be equal objects in this order.
 
         }
 
