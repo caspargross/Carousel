@@ -324,11 +324,10 @@ public class CircularParser {
          */
         Reads.Hidden = new ArrayList<>( );
         Reads.Shown = new ArrayList<>( );
-
         HashMap< String, List< Read > > readMap = new HashMap<>( );
         SamReader reader = SamReaderFactory.makeDefault( ).open( readsBAMFile );
         final long referenceLength = reader.getFileHeader( ).getSequenceDictionary( ).getReferenceLength( );
-
+        referenceSequenceLength = (int)referenceLength;
         /*
         Detect cross-border reads:
          */

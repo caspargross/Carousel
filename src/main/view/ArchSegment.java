@@ -148,7 +148,7 @@ public class ArchSegment {
      */
     public ArchSegment(Read read, GlobalInformation info, int level){
         this.info = info;
-        this.isGapcloser=read.isCircular();
+        this.isGapcloser=read.isCrossBorder();
         this.isReversed=read.getNegativeStrandFlag();
         this.alignmentStart =read.getAlignmentStart(); //TODO: Check if thos need both to be decremented by 1 or not
         this.alignmentEnd = read.getAlignmentEnd();

@@ -125,7 +125,7 @@ public class Read {
      * @return Read.alignmentLength
      */
     public int getAlignmentLength( ) {
-        return alignmentEnd;
+        return alignmentLength;
     }
 
     /**
