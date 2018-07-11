@@ -1,14 +1,27 @@
 package playground;
 
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.scene.layout.Pane;
 import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
+import javafx.scene.transform.Scale;
 import main.view.GlobalInformation;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Helper class for the View, TODO: document properly
  * @author Felix
  */
 public class ViewHelper {
+
+    public static DoubleProperty scaleCount = new SimpleDoubleProperty(0);
+    public static DoubleProperty rotationValue = new SimpleDoubleProperty(0);
+    public static List<Pane> tickmarkList = new ArrayList<Pane>();
+    public static List<Scale> scaleList = new ArrayList<Scale>();
+
     public static Line[] circleOfTickmarks (GlobalInformation gInfo, double length, int degree) {
         Line[] lineArray = new Line[360 / degree];
         double tempSX, tempEX, tempSY, tempEY;
@@ -40,6 +53,7 @@ public class ViewHelper {
         }
         return lineArray;
     }
+
     public static Text centerTextOnCoordinate(String text, double x, double y )
     {
         Text  txtShape = new Text( x, y, text );

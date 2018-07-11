@@ -213,9 +213,6 @@ public class CircularView {
         long timeBefore,
                 timeAfter;
         timeBefore = System.currentTimeMillis();
-        for(int i = 0; i< listOfReadLists.get(0).size();i++){
-            System.out.println(listOfReadLists.get(0).get(i).getAlignmentLength());
-        }
         int readcount = 0;
         for(int i = 0; i < listOfReadLists.size(); i++){
             for(int j = 0; j <listOfReadLists.get(i).size();j++)
@@ -247,6 +244,7 @@ public class CircularView {
                            level++;
                            firstReadInLevelSet=false;
                            index = 0;
+
                            leftBound=0; //Possibly not needed | Because it gets set at firstRead anyway
 
 
@@ -292,13 +290,16 @@ public class CircularView {
                                    listOfReadLists.get((index+startIndex)%gLength).remove(j);
                                    //index += tempLength;
                                    index = tempIndex;
-                                   //System.out.println("we are gonna add something, this isnt the first in this level, index now "+ index +"readlength was" + tempLength + " current percentage of distributed reads is: " + ((double)readArrayList.size()/(double)readcount));
+                                   //System.out.println("we are gonna add something, this isnt the first in this level, index now "+ index + " current percentage of distributed reads is: " + ((double)readArrayList.size()/(double)readcount));
                                    if(index>=gLength-1){  //- we no longer can increase the index: SO we simply add another ring(level), reset the variables so that we are in a new level and contiue working till every Read is distributed
                                        //System.out.println("we are going to increase the level: currentl level before incrementation: " + level);
                                        level++;
+                                       
                                        firstReadInLevelSet=false;
                                        index = 0;
-                                       leftBound=0; //Possibly not needed | Because it gets set at firstRead anyway
+                                       leftBound=0;
+
+                                       //Possibly not needed | Because it gets set at firstRead anyway
 
                                    }
 
@@ -336,6 +337,16 @@ public class CircularView {
         System.out.println("The creation of the level-array took " + (timeAfter-timeBefore) + "milliseconds");
         return levelArrayList.toArray(new Integer[levelArrayList.size()]);
 
+    }
+    public void enableCacheOfReadViews(){
+        for(int i = 0; i < readViews.length; i++){
+            readViews[i].getArchSegment().getInner().setCache(true);
+        }
+    }
+    public void disableCacheOfReadViews(){
+        for(int i = 0; i < readViews.length; i++){
+            readViews[i].getArchSegment().getInner().setCache(false);
+        }
     }
 
     public ReadView[] getReadViews() {

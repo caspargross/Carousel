@@ -1,4 +1,5 @@
 package main.view;
+import javafx.scene.CacheHint;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
@@ -81,7 +82,7 @@ public class ArchSegment {
      */
     public void updateHeight(double height){
         //calculate the effective radius based on height,level,radius
-        double effradius = info.getRadius()+ level*height;
+        double effradius = info.getRadius()+ level*height + height/2;
         //do Math to create Points A,B,C,D.
         //Convention: if direction is true (clockwise) the created ArchSegment looks like this:
         //              B-  -   -   _   _
@@ -89,7 +90,7 @@ public class ArchSegment {
         //           A  -      -    _               /
         //                               -     -  C
         // if direction is false Line CD is left from AD
-
+/*
         Coordinate A = new Coordinate(effradius*Math.cos(Math.toRadians((alignmentStart/info.getGlobalLength())*360)),effradius*Math.sin(Math.toRadians((alignmentStart/info.getGlobalLength())*360)));
         Coordinate B = new Coordinate((effradius+info.getHeight())*Math.cos(Math.toRadians((alignmentStart/info.getGlobalLength())*360)),(effradius+info.getHeight())*Math.sin(Math.toRadians((alignmentStart/info.getGlobalLength())*360)));
         Coordinate C = new Coordinate(effradius*Math.cos(Math.toRadians(((alignmentStart+readLength)/info.getGlobalLength())*360)),effradius * (Math.sin(Math.toRadians(((alignmentStart+readLength)/info.getGlobalLength())*360))));
@@ -124,7 +125,7 @@ public class ArchSegment {
         outer.setStartAngle(((info.getGlobalLength()-alignmentStart)/info.getGlobalLength())*360);
         outer.setLength((readLength/info.getGlobalLength())*-360);
         outer.setStroke(archColor);
-        outer.setFill(Color.TRANSPARENT);
+        outer.setFill(Color.TRANSPARENT);*/
 
         inner.setCenterX(info.getCenter().getX());
         inner.setCenterY(info.getCenter().getY());
@@ -134,6 +135,8 @@ public class ArchSegment {
         inner.setLength((readLength/info.getGlobalLength())*-360);
         inner.setStroke(archColor);
         inner.setFill(Color.TRANSPARENT);
+        inner.setStrokeWidth(height);
+        inner.setCacheHint(CacheHint.SPEED);
 
 
     }
@@ -156,7 +159,8 @@ public class ArchSegment {
         calculateReadLengthOfCircularRead();
         determinteStandardColor();
         updateHeight(info.getHeight());
-        setStrokeWidth(3);
+        //setStrokeWidth(2);
+
     }
 
     /**
