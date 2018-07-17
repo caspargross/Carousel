@@ -14,7 +14,8 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox prefHeight="1000.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1">
+<?import javafx.scene.Group?>
+<VBox prefHeight="1000.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controller.FxmlController">
 <children>
     <MenuBar VBox.vgrow="NEVER">
         <menus>
@@ -22,7 +23,7 @@
                 <items>
                     <Menu mnemonicParsing="false" text="Open Bam/Sam Files">
                         <items>
-                            <MenuItem mnemonicParsing="false" text="File Chooser SAM/BA" />
+                            <MenuItem mnemonicParsing="false" text="File Chooser SAM/BA" onAction="#menuOpenBam"></MenuItem>
                             <MenuItem mnemonicParsing="false" text="File Chooser Fasta" />
 
                         </items>
@@ -58,7 +59,7 @@
         </menus>
     </MenuBar>
       
-    <SplitPane dividerPositions="0.0, 1.0" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
+    <SplitPane dividerPositions="0.0, 1.0" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" fx:id="mainSplitPane">
         <items>
             <AnchorPane maxWidth="200.0" minWidth="200.0" prefWidth="200.0">
                 <children>
@@ -82,10 +83,10 @@
                      </children>
                   </VBox>
                 </children>
-            </AnchorPane fx:id="MainPane">
-            <AnchorPane />
+            </AnchorPane >
+            <Pane fx:id="mainPane">
+            </Pane>
             <AnchorPane maxWidth="200.0" minWidth="200.0" prefHeight="200.0" prefWidth="200.0" />
-            <AnchorPane />
         </items>
     </SplitPane>
     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
