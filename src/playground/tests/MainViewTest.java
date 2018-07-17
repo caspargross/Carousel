@@ -1,3 +1,5 @@
+package playground.tests;
+
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.event.Event;
@@ -49,13 +51,12 @@ public class MainViewTest extends Application {
         primaryStage.setScene( new Scene( myPane, 400, 400));
         primaryStage.show( );
 
-        final File onlyBAMFileToTest = new File("./data/03_plB.bam");
-        final File BAMFileToTest = new File("./data/sampleC_02_lr_mapped.bam");
-        final File BAIFileToTest = new File("./data/sampleC_02_lr_mapped.bam.bai");
-        final File referenceSequencfile = new File("./data/sampleC_02.fasta");
+        final File BAMFileToTest = new File("./data/sampleC_02_lr_mapped.bam"),
+                   BAIFileToTest = new File("./data/sampleC_02_lr_mapped.bam.bai"),
+                   referenceSequenceFile = new File("./data/sampleC_02.fasta");
 
-        CircularParser.parse(onlyBAMFileToTest);
-        int referenceLength = CircularParser.getReferenceSequenceLength();
+        CircularParser.parse(referenceSequenceFile, BAMFileToTest, BAIFileToTest);
+        int referenceLength = CircularParser.ReferenceSequences.getCurrentReferenceSequenceLength();
         ObservableList< List< Read > > temp = CircularParser.Reads.getReadsSorted();
         int longAmount = 0;
         for(int i = 0; i < temp.size();i++){

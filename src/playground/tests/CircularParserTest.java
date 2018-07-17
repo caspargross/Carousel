@@ -37,6 +37,8 @@ public class CircularParserTest {
      * Compares the execution time of CircularParser.parse( ) of the version which uses SamReader.query (and thus
      * requires a BAI file) versus the version without using SamReader.query (and thus just looping over all
      * SamReadRecord objects) and prints the result to System.out.
+     * <p>
+     * There have in fact been contradicting measurements on different hardware as to which version is actually faster.
      */
     private static TestCase compareExecutionTime = new TestCase( ) {
         /**
@@ -50,7 +52,7 @@ public class CircularParserTest {
                     timeSecondVersion;
 
             timeBefore = System.currentTimeMillis( );
-            CircularParser.parse( readsFile );
+            CircularParser.parse( referenceSequenceFile, readsFile );
             timeAfter = System.currentTimeMillis( );
 
             timeFirstVersion = timeAfter - timeBefore;
@@ -119,9 +121,25 @@ public class CircularParserTest {
     };
 
     /**
+     * Prints the output of CircularParser.ReferenceSequences.getIdentifiers( ) after parsing.
+     */
+    private static TestCase outputReferenceSequencesIdentifiers = new TestCase( ) {
+        /**
+         * Overrides TestCase.perform( ).
+         * @throws Exception
+         */
+        public void perform( ) throws Exception {
+            CircularParser.parse( referenceSequenceFile, readsFile, indexFile );
+            for( String identifier : CircularParser.ReferenceSequences.getIdentifiers( ) )
+                System.out.println( identifier );
+            return;
+        }
+    };
+
+    /**
      * The test which should be performed.
      */
-    private static TestCase testCaseToPerform = hideReadsCircularThenRandom;
+    private static TestCase testCaseToPerform = outputReferenceSequencesIdentifiers;
 
 
     /**

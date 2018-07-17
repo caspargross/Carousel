@@ -78,9 +78,9 @@ public class MainView extends AnchorPane {
 
     }
     private void constructCircularView( ObservableList< List< Read > > listOfReadLists){
-        int referenceLength = CircularParser.getReferenceSequenceLength();
+        int referenceLength = CircularParser.ReferenceSequences.getCurrentReferenceSequenceLength();
         //GlobalInformation gInfo = new GlobalInformation(referenceLength);
-        System.out.println("ReferenceLength of "+CircularParser.getReferenceSequenceLength());
+        System.out.println("ReferenceLength of "+CircularParser.ReferenceSequences.getCurrentReferenceSequenceLength());
         System.out.println("List Changed");
         DoubleProperty height = new SimpleDoubleProperty(2);
         Coordinate center = new Coordinate(1000,450);

@@ -10,14 +10,17 @@ import javafx.collections.ObservableList;
 
 import java.io.File;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Note: This is the first version of the CircularParser. It does not yet account for sequencing errors (e.g. overlaps
  * in the reference sequence or a read missing bases in homopolymers such as polyA regions).
  * <p>
- * Parses a BAM file constructing cross-border reads if present. A read is called cross-border if it is aligned at least
- * two times to the reference sequence such that it overlaps both at the beginning and at the end of the reference
- * sequences in a fitting manner such that these occurrences of the same read can be combined to one occurrence.
+ * This is the core class of the model. Detects cross-border reads which are reads aligned at least two times to the
+ * reference sequence such that it overlaps both at the beginning and at the end of the reference sequences in a fitting
+ * manner such that these occurrences of the same read can be combined to one occurrence.
+ * <p>
+ * Apart from that, offers many interfaces to be used by the view / control.
  *
  * @author Mauro Di Girolamo
  */
@@ -101,6 +104,7 @@ public class CircularParser {
          * more information.
          */
         private static void createSorted( ) {
+            int referenceSequenceLength = ReferenceSequences.getCurrentReferenceSequenceLength( );
             Collections.sort( Reads.Shown, Order.AlignmentStart );
             List< List< Read > > newSorted = new ArrayList<>( ); // Values will be added to this list first to avoid triggering the listener multiple times.
             /*
@@ -159,6 +163,15 @@ public class CircularParser {
 
         }
 
+
+        /**
+         * The default amount of reads to display to the view. The CircularParser.parse( ) method will pass a value such
+         * that this amount of reads will be showed by the view with the CrossBorderBeforeRandom order being applied
+         * before hiding.
+         */
+        private static final int defaultReadAmountToDisplay = 500;
+
+
         /**
          * Orders CircularParser.Reads.Shown given a total order and then moves the first amountToHide elements from
          * CircularParser.Reads.Shown to CircularParser.Reads.Hidden.
@@ -199,35 +212,86 @@ public class CircularParser {
 
 
     /**
-     * The length of the reference sequence.
+     * This class contains all reference sequences resulting from parsing.
      */
-    private static int referenceSequenceLength;
+    public static class ReferenceSequences {
 
-    /**
-     * Returns CircularParser.referenceSequenceLength.
-     *
-     * @return CircularParser.referenceSequenceLength
-     */
-    public static int getReferenceSequenceLength( ) {
-        return referenceSequenceLength;
+        /**
+         * A list of FastaSequence objects containing the raw parsed data.
+         */
+        private static List< FastaSequence > referenceSequences;
+
+        /**
+         * The index of the reference sequence from the referenceSequences list which is currently selected.
+         */
+        private static int indexOfSelectedSequence;
+
+
+        /**
+         * Parses a FASTA file and extracts the reference sequences contained.
+         *
+         * @param referenceSequence              the FASTA file to extract the sequences from
+         * @param referenceSequenceIndexToSelect the index of the reference sequence which should be selected
+         *
+         * @throws Exception
+         */
+        private static void parseReferenceSequences( File referenceSequence, int referenceSequenceIndexToSelect ) throws Exception {
+            referenceSequences = FastaParser.parse( referenceSequence, FastaSequence.Code.NucleicAcid );
+            if( referenceSequences.size( ) == 0 )
+                throw new Exception( "No reference sequence was found in file " + referenceSequence.toPath( ) + "!" );
+            if( referenceSequenceIndexToSelect < 0 || referenceSequenceIndexToSelect > referenceSequences.size( ) - 1 )
+                throw new Exception( "The value of referenceSequenceIndexToSelect is not between 0 and referenceSequences.size() - 1." );
+            indexOfSelectedSequence = referenceSequenceIndexToSelect;
+            return;
+        }
+
+
+        /**
+         * Returns referenceSequences.get( indexOfSelectedSequence ).
+         *
+         * @return referenceSequences.get(indexOfSelectedSequence)
+         */
+        public static FastaSequence getCurrentReferenceSequence( ) {
+            return referenceSequences.get( indexOfSelectedSequence );
+        }
+
+
+        /**
+         * Returns referenceSequences.get( indexOfSelectedSequence ).getSequence( ).length( ).
+         *
+         * @return referenceSequences.get(indexOfSelectedSequence).getSequence().length()
+         */
+        public static int getCurrentReferenceSequenceLength( ) {
+            return referenceSequences.get( indexOfSelectedSequence ).getSequence( ).length( );
+        }
+
+
+        /**
+         * Returns a list of string objects containing the identifiers of all the reference sequences.
+         *
+         * @return a list of string objects containing the identifiers of all the reference sequences
+         */
+        public static List< String > getIdentifiers( ) {
+            return referenceSequences.stream( ).map( FastaSequence::getIdentifier ).collect( Collectors.toList( ) );
+        }
+
     }
 
 
     /**
      * Iterates over all mapped reads in order to detect cross-border reads and save these into a convenient
-     * representation. The Read objects will then be saved into the readList and an appropriate subset of the Read
-     * references are added to the viewReadList to be displayed by the view.
+     * representation setting the attributes of the ReferenceSequences and Reads classes.
      * <p>
-     * The algorithmn uses a HashMap structured such that duplicate reads can be found easily. This is achieved by using
-     * the read names as the index of the HashMap and a list of Read object as the values so that each list contains
-     * duplicates of the same read being mapped to different positions of the reference sequence. parse( ) uses this
-     * attribute to save its output.
+     * The SamReader.query( ) method will be used if readsBAIFile is not null. Due to the fact that there have in fact
+     * been contradicting measurements on different hardware as to whether the SamReader.query( ) version is actually
+     * faster than the version with just looping over the entire BAM file once, both versions remain implemented.
      *
-     * @param referenceSequence a FASTQ file containing the reference sequence
-     * @param readsBAMFile      a BAM file containing the reads to be parsed
-     * @param readsBAIFile      the BAI file which fits to the BAM file
+     * @param referenceSequencesFASTAFile a FASTA file containing the reference sequence(s)
+     * @param referenceSequenceToSelect   the index of the reference sequence to be used
+     * @param readsBAMFile                a BAM file containing the reads to be parsed
+     * @param readsBAIFile                the reads BAI file, may be null
      */
-    public static void parse( File referenceSequence, File readsBAMFile, File readsBAIFile ) throws Exception {
+    public static void parse( File referenceSequencesFASTAFile, int referenceSequenceToSelect, File readsBAMFile, File readsBAIFile ) throws Exception {
 
         /*
         Remove all reads currently parsed from the internal lists:
@@ -239,143 +303,185 @@ public class CircularParser {
         /*
         Open reference sequence FASTA, reads BAM and BAI file:
          */
-        int referenceIndex = 0;
-        SamReader reader = SamReaderFactory.makeDefault( ).open( SamInputResource.of( readsBAMFile ).index( readsBAIFile ) );
-        referenceSequenceLength = reader.getFileHeader( ).getSequenceDictionary( ).getSequence( referenceIndex ).getSequenceLength( );
+        ReferenceSequences.parseReferenceSequences( referenceSequencesFASTAFile, referenceSequenceToSelect );
+        SamReader reader = SamReaderFactory.makeDefault( ).open( readsBAIFile != null ? SamInputResource.of( readsBAMFile ).index( readsBAIFile ) : SamInputResource.of( readsBAMFile ) ); // Open BAI file only if it is available.
+        if( ReferenceSequences.getCurrentReferenceSequenceLength( ) != reader.getFileHeader( ).getSequenceDictionary( ).getReferenceLength( ) )
+            throw new Exception( "The reference sequences FASTA file does not match the BAM file, because the length of the selected reference sequence differs." );
+        int referenceSequenceLength = ReferenceSequences.getCurrentReferenceSequenceLength( );
 
         /*
-        Get two seperate disjunct read sets, one containing the reads which overlap the interval [1,1] and the other containing the reads which overlap the interval [referenceSequenceLength, referenceSequenceLength]:
-         */
-        SAMRecordIterator interestingReadsAtBeginningIterator = reader.query( new QueryInterval[]{ new QueryInterval( referenceIndex, 1, 1 ) }, false ); // contained: false, so that the reads only need to overlap the interval. I pass a QueryInterval array containing only one element instead of using the overloaded version of the query method which expects only a single interval to be passed, because that version would require passing the reference sequence name as a String rather than its ID.
+        Now, branch into the two cases of having a BAI file or not:
+        */
+        if( reader.hasIndex( ) ) {
 
-        /*
-        Add all reads which overlap [1,1] to a HashMap or to Reads.Shown if they are not right clipped:
-         */
-        HashMap< String, List< Read > > readMap = new HashMap<>( );
-        while( interestingReadsAtBeginningIterator.hasNext( ) ) {
-            SAMRecord interestingReadRecordAtBeginning = interestingReadsAtBeginningIterator.next( );
-            if( !interestingReadRecordAtBeginning.getCigar( ).isLeftClipped( ) )
-                Reads.Shown.add( Read.createNewReadFromSAMRecord( interestingReadRecordAtBeginning ) );
-            else {
-                String interestingReadName = interestingReadRecordAtBeginning.getReadName( );
-                List< Read > readsWithSameNameAlreadySeenList = readMap.get( interestingReadName );
-                if( readsWithSameNameAlreadySeenList == null ) { // We have not seen a read with this name yet, so put a new list into the HashMap.
-                    readsWithSameNameAlreadySeenList = new ArrayList< Read >( );
-                    readsWithSameNameAlreadySeenList.add( Read.createNewReadFromSAMRecord( interestingReadRecordAtBeginning ) );
-                    readMap.put( interestingReadName, readsWithSameNameAlreadySeenList );
-                } else
-                    readsWithSameNameAlreadySeenList.add( Read.createNewReadFromSAMRecord( interestingReadRecordAtBeginning ) );
+            /*
+            BAI file is available.
+            Therefore, the SamReader.query( ) method can be used.
+             */
+
+            /*
+            Get two seperate disjunct read sets, one containing the reads which overlap the interval [1,1] and the other containing the reads which overlap the interval [referenceSequenceLength, referenceSequenceLength]:
+            */
+            SAMRecordIterator interestingReadsAtBeginningIterator = reader.query( new QueryInterval[]{ new QueryInterval( referenceSequenceToSelect, 1, 1 ) }, false ); // contained: false, so that the reads only need to overlap the interval. I pass a QueryInterval array containing only one element instead of using the overloaded version of the query method which expects only a single interval to be passed, because that version would require passing the reference sequence name as a String rather than its ID.
+
+            /*
+            Add all reads which overlap [1,1] to a HashMap or to Reads.Shown if they are not right clipped:
+             */
+            HashMap< String, List< Read > > readMap = new HashMap<>( );
+            while( interestingReadsAtBeginningIterator.hasNext( ) ) {
+                SAMRecord interestingReadRecordAtBeginning = interestingReadsAtBeginningIterator.next( );
+                if( !interestingReadRecordAtBeginning.getCigar( ).isLeftClipped( ) )
+                    Reads.Shown.add( Read.createNewReadFromSAMRecord( interestingReadRecordAtBeginning ) );
+                else {
+                    String interestingReadName = interestingReadRecordAtBeginning.getReadName( );
+                    List< Read > readsWithSameNameAlreadySeenList = readMap.get( interestingReadName );
+                    if( readsWithSameNameAlreadySeenList == null ) { // We have not seen a read with this name yet, so put a new list into the HashMap.
+                        readsWithSameNameAlreadySeenList = new ArrayList< Read >( );
+                        readsWithSameNameAlreadySeenList.add( Read.createNewReadFromSAMRecord( interestingReadRecordAtBeginning ) );
+                        readMap.put( interestingReadName, readsWithSameNameAlreadySeenList );
+                    } else
+                        readsWithSameNameAlreadySeenList.add( Read.createNewReadFromSAMRecord( interestingReadRecordAtBeginning ) );
+                }
+
+            }
+            interestingReadsAtBeginningIterator.close( );
+
+            /*
+            Now loop over all reads which overlap [referenceSequenceLength, referenceSequenceLength], either combine them with a fitting read of the readMap or add them to Reads.Shown if we can not combine them.
+             */
+            SAMRecordIterator interestingReadsAtEndIterator = reader.query( new QueryInterval[]{ new QueryInterval( referenceSequenceToSelect, referenceSequenceLength, referenceSequenceLength ) }, false );
+            while( interestingReadsAtEndIterator.hasNext( ) ) {
+                SAMRecord newReadRecord = interestingReadsAtEndIterator.next( );
+                String readName = newReadRecord.getReadName( );
+                List< Read > oldReads;
+                if( newReadRecord.getCigar( ).isRightClipped( ) && ( oldReads = readMap.get( readName ) ) != null ) {
+                    Read oldRead = oldReads.get( 0 );
+                    constructCrossBorderRead( oldRead, newReadRecord, true );
+                    oldReads.remove( 0 );
+                    Reads.Shown.add( oldRead );
+                } else // The read is either nor right clipped or do not have any candidate to merge, so just add this read to Reads.Shown:
+                    Reads.Shown.add( Read.createNewReadFromSAMRecord( newReadRecord ) );
+            }
+            interestingReadsAtEndIterator.close( );
+
+            /*
+            Unpack the HashMap and add all values to Reads.Shown:
+             */
+            Collection< List< Read > > readMapValueCollection = readMap.values( );
+            for( List< Read > readMapValueList : readMapValueCollection )
+                Reads.Shown.addAll( readMapValueList );
+
+            /*
+            Add all other Reads which overlap neither [1,1] nor [referenceSequenceLength, referenceSequenceLength] <=> are completely contained in [2, referenceSequenceLength - 1]:
+             */
+            SAMRecordIterator uninterestingReadsIterator = reader.query( new QueryInterval[]{ new QueryInterval( 0, 2, referenceSequenceLength - 1 ) }, true ); // true: Resulting reads must be contained within the interval.
+            while( uninterestingReadsIterator.hasNext( ) )
+                Reads.Shown.add( Read.createNewReadFromSAMRecord( uninterestingReadsIterator.next( ) ) );
+            uninterestingReadsIterator.close( );
+
+        } else {
+
+            /*
+            BAI file is not available.
+            Therefore, the SamReader.query( ) method can not be used.
+            */
+
+            /*
+            Instead, a HashMap structured such that duplicate reads can be found easily will be created. This is achieved by using the read names as the index of the HashMap and a list of Read object as the values so that each list contains duplicates of the same read being mapped to different positions of the reference sequence.
+             */
+            HashMap< String, List< Read > > readMap = new HashMap<>( );
+            for( SAMRecord newReadRecord : reader ) {
+                String readName = newReadRecord.getReadName( );
+                List< Read > oldReads;
+                if( ( oldReads = readMap.get( readName ) ) != null ) { // We see this read for at least the second time, check for Plasmid:
+                    Cigar newCigar = newReadRecord.getCigar( );
+                    boolean newReadSuccessfullyMerged = false,
+                            newReadAtStart = newReadRecord.getAlignmentStart( ) == 1, // 1-based coordinate system, so 1 is first position.
+                            newReadAtEnd = newReadRecord.getAlignmentEnd( ) == referenceSequenceLength;
+                    if( newCigar.isClipped( ) && ( newReadAtStart || newReadAtEnd ) ) // New Read overlaps at the start or the end of the reference sequence.
+                        for( Read oldRead : oldReads ) // Loop through all duplicates of this read which have already been found.
+                            if( !oldRead.isCrossBorder( ) ) { // oldRead is a candidate to combine.
+                                Cigar oldCigar = oldRead.getCigar( );
+                                boolean rightNewLeftOld = newCigar.isRightClipped( ) &&
+                                                          oldCigar.isLeftClipped( ) &&
+                                                          oldRead.getAlignmentStart( ) == 1, // 1-based coordinate system, so 1 is first position.
+                                        leftNewRightOld = newCigar.isLeftClipped( ) &&
+                                                          oldCigar.isRightClipped( ) &&
+                                                          oldRead.getAlignmentEnd( ) == referenceSequenceLength;
+                                if( rightNewLeftOld || leftNewRightOld ) { // We can combined oldRead and newReadRecord!
+                                    constructCrossBorderRead( oldRead, newReadRecord, rightNewLeftOld );
+                                    if( !newReadSuccessfullyMerged )
+                                        newReadSuccessfullyMerged = true;
+                                    break; // Can only merge one read once.
+                                }
+                            }
+                    if( !newReadSuccessfullyMerged ) // We were not able to merge the new read into a old read, so just add it to the proper List in the HashMap
+                        oldReads.add( Read.createNewReadFromSAMRecord( newReadRecord ) );
+                } else { // First time we see the read, just add it to the HashMap:
+                    readMap.put( readName, new ArrayList<>( ) );
+                    readMap.get( readName ).add( Read.createNewReadFromSAMRecord( newReadRecord ) );
+                }
             }
 
+            /*
+            Unpack the HashMap and add all values to Reads.Shown:
+             */
+            Collection< List< Read > > readMapValueCollection = readMap.values( );
+            for( List< Read > readMapValueList : readMapValueCollection )
+                Reads.Shown.addAll( readMapValueList );
+
         }
-        interestingReadsAtBeginningIterator.close( );
 
         /*
-        Now loop over all reads which overlap [referenceSequenceLength, referenceSequenceLength], either combine them with a fitting read of the readMap or add them to Reads.Shown if we can not combine them.
+         * Hide an appropriate amount of reads (which also creates CircularParser.Reads.Sorted):
          */
-        SAMRecordIterator interestingReadsAtEndIterator = reader.query( new QueryInterval[]{ new QueryInterval( referenceIndex, referenceSequenceLength, referenceSequenceLength ) }, false );
-        while( interestingReadsAtEndIterator.hasNext( ) ) {
-            SAMRecord newReadRecord = interestingReadsAtEndIterator.next( );
-            String readName = newReadRecord.getReadName( );
-            List< Read > oldReads;
-            if( newReadRecord.getCigar( ).isRightClipped( ) && ( oldReads = readMap.get( readName ) ) != null ) {
-                Read oldRead = oldReads.get( 0 );
-                constructCrossBorderRead( oldRead, newReadRecord, true );
-                oldReads.remove( 0 );
-                Reads.Shown.add( oldRead );
-            } else // The read is either nor right clipped or do not have any candidate to merge, so just add this read to Reads.Shown:
-                Reads.Shown.add( Read.createNewReadFromSAMRecord( newReadRecord ) );
-        }
-        interestingReadsAtEndIterator.close( );
-
-        /*
-        Unpack the HashMap and add all values to Reads.Shown:
-         */
-        Collection< List< Read > > readMapValueCollection = readMap.values( );
-        for( List< Read > readMapValueList : readMapValueCollection )
-            Reads.Shown.addAll( readMapValueList );
-
-        /*
-        Add all other Reads which overlap neither [1,1] nor [referenceSequenceLength, referenceSequenceLength] <=> are completely contained in [2, referenceSequenceLength - 1]:
-         */
-        SAMRecordIterator uninterestingReadsIterator = reader.query( new QueryInterval[]{ new QueryInterval( 0, 2, referenceSequenceLength - 1 ) }, true ); // true: Resulting reads must be contained within the interval.
-        while( uninterestingReadsIterator.hasNext( ) )
-            Reads.Shown.add( Read.createNewReadFromSAMRecord( uninterestingReadsIterator.next( ) ) );
-        uninterestingReadsIterator.close( );
-
-        /*
-         * Create CircularParser.Reads.Sorted:
-         */
-        Reads.createSorted( );
+        Reads.hide( Reads.Shown.size( ) - Reads.defaultReadAmountToDisplay, Reads.Order.CrossBorderBeforeRandom );
 
         return;
     }
 
     /**
-     * Alternative version of CircularParser.parse( ) which does not require a BAI file. Therefore, it is a bit less
-     * efficient (around 20% slower in my local measurements). Uses a HashMap as well.
+     * No value passed for referenceSequenceToSelect:
+     * <p>
+     * Alias of CircularParser.parse( referenceSequencesFASTAFile, 0, readsBAMFile, readsBAIFile ).
      *
-     * @param readsBAMFile a BAM file containing the reads to be parsed
+     * @param referenceSequencesFASTAFile a FASTA file containing the reference sequence(s)
+     * @param readsBAMFile                a BAM file containing the reads to be parsed
+     * @param readsBAIFile                the reads BAI file, may be null
+     *
+     * @throws Exception
      */
-    public static void parse( File readsBAMFile ) throws Exception {
+    public static void parse( File referenceSequencesFASTAFile, File readsBAMFile, File readsBAIFile ) throws Exception {
+        parse( referenceSequencesFASTAFile, 0, readsBAMFile, readsBAIFile );
+        return;
+    }
 
-        /*
-        Remove all reads currently parsed from the internal lists:
-         */
-        Reads.Hidden = new ArrayList<>( );
-        Reads.Shown = new ArrayList<>( );
-        HashMap< String, List< Read > > readMap = new HashMap<>( );
-        SamReader reader = SamReaderFactory.makeDefault( ).open( readsBAMFile );
-        final long referenceLength = reader.getFileHeader( ).getSequenceDictionary( ).getReferenceLength( );
-        referenceSequenceLength = (int)referenceLength;
-        /*
-        Detect cross-border reads:
-         */
-        for( SAMRecord newReadRecord : reader ) {
-            String readName = newReadRecord.getReadName( );
-            List< Read > oldReads;
-            if( ( oldReads = readMap.get( readName ) ) != null ) { // We see this read for at least the second time, check for Plasmid:
-                Cigar newCigar = newReadRecord.getCigar( );
-                boolean newReadSuccessfullyMerged = false,
-                        newReadAtStart = newReadRecord.getAlignmentStart( ) == 1, // 1-based coordinate system, so 1 is first position.
-                        newReadAtEnd = newReadRecord.getAlignmentEnd( ) == referenceLength;
-                if( newCigar.isClipped( ) && ( newReadAtStart || newReadAtEnd ) ) // New Read overlaps at the start or the end of the reference sequence.
-                    for( Read oldRead : oldReads ) // Loop through all duplicates of this read which have already been found.
-                        if( !oldRead.isCrossBorder( ) ) { // oldRead is a candidate to combine.
-                            Cigar oldCigar = oldRead.getCigar( );
-                            boolean rightNewLeftOld = newCigar.isRightClipped( ) &&
-                                                      oldCigar.isLeftClipped( ) &&
-                                                      oldRead.getAlignmentStart( ) == 1, // 1-based coordinate system, so 1 is first position.
-                                    leftNewRightOld = newCigar.isLeftClipped( ) &&
-                                                      oldCigar.isRightClipped( ) &&
-                                                      oldRead.getAlignmentEnd( ) == referenceLength;
-                            if( rightNewLeftOld || leftNewRightOld ) { // We can combined oldRead and newReadRecord!
-                                constructCrossBorderRead( oldRead, newReadRecord, rightNewLeftOld );
-                                if( !newReadSuccessfullyMerged )
-                                    newReadSuccessfullyMerged = true;
-                                break; // Can only merge one read once.
-                            }
-                        }
-                if( !newReadSuccessfullyMerged ) // We were not able to merge the new read into a old read, so just add it to the proper List in the HashMap
-                    oldReads.add( Read.createNewReadFromSAMRecord( newReadRecord ) );
-            } else { // First time we see the read, just add it to the HashMap:
-                readMap.put( readName, new ArrayList<>( ) );
-                readMap.get( readName ).add( Read.createNewReadFromSAMRecord( newReadRecord ) );
-            }
-        }
+    /**
+     * No value passed for readsBAIFile:
+     * <p>
+     * Alias of CircularParser.parse( referenceSequencesFASTAFile, referenceSequenceToSelect, readsBAMFile, null ).
+     *
+     * @param referenceSequencesFASTAFile a FASTA file containing the reference sequence(s)
+     * @param referenceSequenceToSelect   the index of the reference sequence to be used
+     * @param readsBAMFile                a BAM file containing the reads to be parsed
+     *
+     * @throws Exception
+     */
+    public static void parse( File referenceSequencesFASTAFile, int referenceSequenceToSelect, File readsBAMFile ) throws Exception {
+        parse( referenceSequencesFASTAFile, referenceSequenceToSelect, readsBAMFile, null );
+        return;
+    }
 
-        /*
-        Unpack the HashMap and add all values to Reads.Shown:
-         */
-        Collection< List< Read > > readMapValueCollection = readMap.values( );
-        for( List< Read > readMapValueList : readMapValueCollection )
-            Reads.Shown.addAll( readMapValueList );
-
-        /*
-         * Create Reads.Sorted:
-         */
-        Reads.createSorted( );
-
+    /**
+     * No value passed for neither referenceSequenceToSelect nor readsBAIFile:
+     * <p>
+     * Alias of CircularParser.parse( referenceSequencesFASTAFile, 0, readsBAMFile, null ).
+     *
+     * @param referenceSequencesFASTAFile a FASTA file containing the reference sequence(s)
+     * @param readsBAMFile                a BAM file containing the reads to be parsed
+     */
+    public static void parse( File referenceSequencesFASTAFile, File readsBAMFile ) throws Exception {
+        parse( referenceSequencesFASTAFile, 0, readsBAMFile, null );
         return;
     }
 
@@ -394,6 +500,7 @@ public class CircularParser {
      * @return oldRead
      */
     private static Read constructCrossBorderRead( Read oldRead, SAMRecord newReadRecord, boolean oldReadIsLeft ) {
+        int referenceSequenceLength = ReferenceSequences.getCurrentReferenceSequenceLength( );
         Cigar newCigar = newReadRecord.getCigar( ),
                 oldCigar = oldRead.getCigar( );
         if( oldReadIsLeft ) {

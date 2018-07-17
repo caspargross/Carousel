@@ -1,3 +1,5 @@
+package playground.tests;
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
@@ -25,8 +27,10 @@ public class ProperMainViewTest extends Application{
     }
     //Change here if you want to parse with reference + bai + bam or a different file genereally
     public void parseBam()throws  Exception{
-        final File onlyBAMFileToTest = new File("./data/01_plB.bam");
-        if(!parsed)CircularParser.parse(onlyBAMFileToTest);parsed = true;
+        final File referenceSequencesFileToTest = new File( "./data/p7_ref.fasta" ),
+                   BAMFileToTest = new File( "./data/p7_mapped.bam" ),
+                   BAIFileToTest = new File( "./data/p7_mapped.bai" );
+        if(!parsed)CircularParser.parse( referenceSequencesFileToTest, BAMFileToTest, BAMFileToTest );parsed = true;
     }
 
     public static void main( String[] args ) {
