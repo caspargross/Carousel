@@ -112,7 +112,7 @@ public class CircularParserTest {
             CircularParser.parse( referenceSequenceFile, readsFile, indexFile );
             int[] readCounts = countReadsParsed( );
             System.out.println( "Before hiding: " + readCounts[ 0 ] + " of " + readCounts[ 1 ] + " reads are circular." );
-            CircularParser.Reads.hide( amountToHide, CircularParser.Reads.Order.CrossBorderThenRandom );
+            CircularParser.Reads.hide( amountToHide, CircularParser.Reads.Order.CrossBorderBeforeRandom );
             readCounts = countReadsParsed( );
             System.out.println( "After hiding: " + readCounts[ 0 ] + " of " + readCounts[ 1 ] + " reads are circular." );
         }
