@@ -8,6 +8,7 @@ import javafx.scene.text.Text;
 import javafx.scene.transform.Scale;
 import main.view.GlobalInformation;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,7 @@ public class ViewHelper {
     public static DoubleProperty rotationValue = new SimpleDoubleProperty(0);
     public static List<Pane> tickmarkList = new ArrayList<Pane>();
     public static List<Scale> scaleList = new ArrayList<Scale>();
+    public static List<Scale> negativeScaleList = new ArrayList<>();
 
     public static Line[] circleOfTickmarks (GlobalInformation gInfo, double length, int degree) {
         Line[] lineArray = new Line[360 / degree];

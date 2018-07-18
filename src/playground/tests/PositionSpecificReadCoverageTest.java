@@ -2,8 +2,6 @@
  * Copyright (C) 2018 Mauro Di Girolamo
  */
 
-package playground.tests;
-
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.layout.Pane;

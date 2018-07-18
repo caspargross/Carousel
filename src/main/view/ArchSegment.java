@@ -1,9 +1,9 @@
 package main.view;
+
 import javafx.scene.CacheHint;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import javafx.scene.shape.Line;
-import playground.Coordinate;
 import main.model.Read;
 
 /**

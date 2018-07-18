@@ -1,6 +1,5 @@
 package main.view;
 
-import javafx.beans.property.DoubleProperty;
 import main.model.Read;
 
 /**

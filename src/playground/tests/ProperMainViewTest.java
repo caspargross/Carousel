@@ -1,4 +1,4 @@
-package playground.tests;
+
 
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -21,7 +21,7 @@ public class ProperMainViewTest extends Application{
             try{
                 if(me.isSecondaryButtonDown())parseBam();
             }catch(Exception ex){
-                System.out.println("invalid BAM file");
+                System.out.println(ex.getMessage());
             }
         });
     }
@@ -30,7 +30,7 @@ public class ProperMainViewTest extends Application{
         final File referenceSequencesFileToTest = new File( "./data/p7_ref.fasta" ),
                    BAMFileToTest = new File( "./data/p7_mapped.bam" ),
                    BAIFileToTest = new File( "./data/p7_mapped.bai" );
-        if(!parsed)CircularParser.parse( referenceSequencesFileToTest, BAMFileToTest, BAMFileToTest );parsed = true;
+        if(!parsed)CircularParser.parse( referenceSequencesFileToTest, BAMFileToTest, BAIFileToTest );parsed = true;
     }
 
     public static void main( String[] args ) {

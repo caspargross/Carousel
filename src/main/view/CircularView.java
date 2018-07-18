@@ -1,15 +1,12 @@
 package main.view;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.value.ObservableListValue;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import main.model.CircularParser;
+import javafx.scene.CacheHint;
 import main.model.Read;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Class containing readViews, and function to create a levelArray. needs a Array of Reads + globalInformation to be constructed
@@ -17,18 +14,18 @@ import java.util.List;
  */
 public class CircularView {
     /**
-     * the Array of Readviews
-     */
-    private ReadView[]readViews;
-    /**
      * the levelArray contains information on which level each Read is to be drawn
      */
     public Integer[] levelArrayAsInteger; // for the second LevelMethod
-    private int[] levelArray;
     /**
      * the GlobalInformation contains information that is needed for the ArchSegments (center,radius,circumference)
      */
     public GlobalInformation info;
+    /**
+     * the Array of Readviews
+     */
+    private ReadView[]readViews;
+    private int[] levelArray;
     private Read[] readArrayOfSecondLevelCreation; // for the second LevelMethod
     /**
      * Creates a new CircularView, additionally creates a levelArray so the readViews can be properly drawn
@@ -55,12 +52,13 @@ public class CircularView {
 
     /**
      * Creates a CircularView, creates a levelArray with a different method since this method is given a different datatype.
-     * No testing available, will propably throw tons of errors.. TODO: Test (duh)
+     * No testing available, will propably throw tons of errors..
      * @param listOfReadLists
      * @param info
      */
 
     public CircularView(ObservableList< List< Read > >  listOfReadLists, GlobalInformation info){
+        printGivenReadList(listOfReadLists);
         this.info = new GlobalInformation(info.getCenter(),info.getRadius(),info.height.getValue(),info.getGlobalLength());
         readViews = new ReadView[calcReadCount(listOfReadLists)];
         levelArrayAsInteger = createLevelArray(listOfReadLists,0);
@@ -74,6 +72,8 @@ public class CircularView {
 
             }
         });
+        printLevelArrayforDebugging();
+        //checkIfLevelArrayisCorrect();
     }
     private int calcReadCount(ObservableList< List< Read > >  listOfReadLists){
         int readcount = 0;
@@ -171,8 +171,6 @@ public class CircularView {
         /**
          * right Bound of our filled Segment of the levelRing (typically read.getAlignmentStart of the firstly placed read. (if the first read is circular start&End are swapped)
          * Since we add on the right side, this continously increases till we no longer find any fitting Reads between rightBound and leftBound
-         * TODO: think if it might be efficient to check first the last read in a ArrayList at a given Index if this could fix (if not the entire other elements in the ArrayList can´t fit either - Since we sort by length decrasingly)
-         * TODO: Test if that thought works
          */
         int rightBound=0;
 
@@ -220,6 +218,8 @@ public class CircularView {
         }
         int firstplaced = 0;
         int placed = 0;
+        deleteWeirdReads(listOfReadLists);
+        System.out.println(listOfReadLists.toString());
         while(!allDistributed){
            while(index <gLength){ // - we traverse the given Array from start to End(i). Since we want to start at the startIndex our acessing indexes are thus calculated like this array[i+startIndex%gLength)
                if (!firstReadInLevelSet){ // - if we haven´t already placed a firstRead in the current level, we have to do that: (so we know our right&left bounds)
@@ -234,9 +234,12 @@ public class CircularView {
                        readArrayList.add(listOfReadLists.get((index+startIndex)%gLength).get(0));
                        levelArrayList.add(level);
                        //System.out.println("added something: " + readArrayList.get(readArrayList.size()-1).getName() + "at level" + levelArrayList.get(levelArrayList.size()-1));
+                       int tempLength = listOfReadLists.get((index+startIndex)%gLength).get(0).getAlignmentLength();
+
                        int tempIndex =listOfReadLists.get((index+startIndex)%gLength).get(0).getAlignmentEnd()-1;
                        listOfReadLists.get((index+startIndex)%gLength).remove(0);
-                       index+=tempIndex;
+                       //index+=tempIndex;
+                       index+=tempLength;
                        //System.out.println("first read in current level placed");
                        //System.out.println("our Index now changed to: " + index);
                        if(index>=gLength-1){  //- we no longer can increase the index: SO we simply add another ring(level), reset the variables so that we are in a new level and contiue working till every Read is distributed
@@ -258,7 +261,6 @@ public class CircularView {
                        System.out.println(firstplaced);
                        allDistributed=true;
                        readArrayOfSecondLevelCreation= readArrayList.toArray(new Read[readArrayList.size()]);
-                       //TODO: insert readArray creation for the constructor. Check if done
                        break;
 
                    }
@@ -285,11 +287,12 @@ public class CircularView {
                                    placed++;
                                    readArrayList.add(listOfReadLists.get((index+startIndex)%gLength).get(j));
                                    levelArrayList.add(level);
-                                   //int tempLength = listOfReadLists.get((index+startIndex)%gLength).get(j).getAlignmentLength();
+                                   int tempLength = listOfReadLists.get((index+startIndex)%gLength).get(j).getAlignmentLength();
                                    int tempIndex = listOfReadLists.get((index+startIndex)%gLength).get(j).getAlignmentEnd()-1;
+
                                    listOfReadLists.get((index+startIndex)%gLength).remove(j);
-                                   //index += tempLength;
-                                   index = tempIndex;
+                                   index += tempLength;
+                                   //index = tempIndex;
                                    //System.out.println("we are gonna add something, this isnt the first in this level, index now "+ index + " current percentage of distributed reads is: " + ((double)readArrayList.size()/(double)readcount));
                                    if(index>=gLength-1){  //- we no longer can increase the index: SO we simply add another ring(level), reset the variables so that we are in a new level and contiue working till every Read is distributed
                                        //System.out.println("we are going to increase the level: currentl level before incrementation: " + level);
@@ -302,6 +305,7 @@ public class CircularView {
                                        //Possibly not needed | Because it gets set at firstRead anyway
 
                                    }
+
 
                                }
                            }
@@ -348,6 +352,16 @@ public class CircularView {
             readViews[i].getArchSegment().getInner().setCache(false);
         }
     }
+    public void cacheToQuality(){
+        for(ReadView rW: readViews){
+            rW.getArchSegment().getInner().setCacheHint(CacheHint.QUALITY);
+        }
+    }
+    public void cacheToSpeed(){
+        for(ReadView rW:readViews){
+            rW.getArchSegment().getInner().setCacheHint(CacheHint.SPEED);
+        }
+    }
 
     public ReadView[] getReadViews() {
         return readViews;
@@ -355,4 +369,128 @@ public class CircularView {
     public int[] getLevelArray(){
         return levelArray;
     }
+
+    public void printLevelArrayforDebugging(){
+        int currentLevel = 0;
+        String[] printText = new String[levelArrayAsInteger[levelArrayAsInteger.length-1]+1];
+        for(String s: printText){
+            s= " s";
+        }
+        for(int i = 0; i < levelArrayAsInteger.length;i++){
+            if(levelArrayAsInteger[i]!=currentLevel){
+              currentLevel++;
+              printText[currentLevel] += "s:"+ readArrayOfSecondLevelCreation[i].getAlignmentStart()+ " l:" + readArrayOfSecondLevelCreation[i].getAlignmentLength() + " e:" + readArrayOfSecondLevelCreation[i].getAlignmentEnd() + " ";
+            }
+            else{
+                printText[currentLevel] += "s:"+ readArrayOfSecondLevelCreation[i].getAlignmentStart()+ " l:" + readArrayOfSecondLevelCreation[i].getAlignmentLength() + " e:" + readArrayOfSecondLevelCreation[i].getAlignmentEnd() + " ";
+
+            }
+        }
+        for (String s:printText) {
+            System.out.println(s);
+        }
+        System.out.println(printText.length);
+
+
+    }
+    public void checkIfLevelArrayisCorrect(){
+        int currentLevel = 0;
+        int currentEnd = 0;
+        boolean onecrossborderperlevel = false;
+        boolean[] correctPlacement = new boolean[levelArrayAsInteger[levelArrayAsInteger.length-1]+1];
+        for(int i = 0; i < correctPlacement.length; i++){
+            correctPlacement[i] = true;
+        }
+        /*for(int i = 0; i < levelArrayAsInteger.length;i++){
+            if(levelArrayAsInteger[i]!=currentLevel){
+                currentLevel++;
+                currentEnd=0;
+                if(!readArrayOfSecondLevelCreation[i].isCrossBorder()&&readArrayOfSecondLevelCreation[i].getAlignmentStart()<currentEnd) correctPlacement[currentLevel]= false;
+
+            }
+            else{
+                if(readArrayOfSecondLevelCreation[i].getAlignmentStart()<currentEnd) correctPlacement[currentLevel]= false;
+
+            }
+            currentEnd=readArrayOfSecondLevelCreation[i].getAlignmentEnd();
+        }*/
+        for(int i = 0; i < levelArrayAsInteger.length;i++){
+             if(onecrossborderperlevel){
+                if(levelArrayAsInteger[i]!=currentLevel){
+                    currentLevel++;
+                    if(readArrayOfSecondLevelCreation[i].isCrossBorder()) {
+                        onecrossborderperlevel= true;
+                    }
+                    else{
+                        onecrossborderperlevel=false;
+                    }
+                }
+                else{
+                    if(readArrayOfSecondLevelCreation[i].isCrossBorder()) correctPlacement[currentLevel] = false;
+                }
+            }
+            if(!onecrossborderperlevel){
+                if(levelArrayAsInteger[i]!=currentLevel){
+                    currentLevel++;
+                    if(readArrayOfSecondLevelCreation[i].isCrossBorder()){
+                        onecrossborderperlevel = true;
+
+                    }
+                    else{
+                        onecrossborderperlevel=false;
+                    }
+                }
+                else{
+                    if(readArrayOfSecondLevelCreation[i].isCrossBorder()) onecrossborderperlevel = true;
+                }
+            }
+
+
+        }
+        for (boolean s:correctPlacement) {
+            System.out.println(s);
+        }
+        System.out.println(correctPlacement.length);
+        int wrongLengthcount =0;
+        for(Read r :readArrayOfSecondLevelCreation){
+            if(r.getAlignmentLength()==0){
+                //System.out.println("Read with 0 length detected starting at" + r.getAlignmentStart()+ "ending at: " + r.getAlignmentEnd() + "IsCrossBorder " +r.isCrossBorder() + "Readname: "+ r.getName() + "Sequence: " + r.getSequence());
+                wrongLengthcount++;
+            }
+
+        }
+        //System.out.println("amount of wrong length reads: " + wrongLengthcount);
+        for(Read r: readArrayOfSecondLevelCreation){
+            int start,end,length,reallength;
+            start = r.getAlignmentStart();
+            end = r.getAlignmentEnd();
+            length= r.getAlignmentLength();
+            reallength=(int)info.getGlobalLength()-start+end;
+            //if(r.isCrossBorder()) System.out.println("Crossborder starting at:" + start+ " length of: "+length+ " ending at: "+ end + " Math: referenceLength -alignmentStart + alignmentEnd = alignmentLength: ("+ (int)info.getGlobalLength() + "-"+start +")+"+end+ "="+reallength+" "+ " !=" + length);
+            //if(!r.isCrossBorder()) System.out.println("Read starting at: "+ start+" length of: "+ length +" end at: "+end);
+        }
+    }
+    private void printGivenReadList(ObservableList< List< Read > >  listOfReadLists){
+        for(List<Read> readList:listOfReadLists){
+            String temp= "";
+            if(!readList.isEmpty()){
+                for(Read read:readList){
+                    temp+=" s: " +read.getAlignmentStart() + " l: "+read.getAlignmentLength() + " e: " + read.getAlignmentEnd();
+                }
+                System.out.println(temp);
+            }
+
+        }
+    }
+    private ObservableList< List< Read > > deleteWeirdReads(ObservableList< List< Read > >  listOfReadLists){
+        for(List<Read> list:listOfReadLists) {
+            for (Read read : list) {
+                if(Objects.equals(read.getSequence(), "*")) read.setAlignmentLength(read.getAlignmentEnd()-read.getAlignmentStart());
+            }
+        }
+        return listOfReadLists;
+    }
+
+
+
 }

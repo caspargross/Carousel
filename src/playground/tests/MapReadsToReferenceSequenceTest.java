@@ -2,8 +2,6 @@
  * Copyright (C) 2018 Mauro Di Girolamo
  */
 
-package playground.tests;
-
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
