@@ -21,6 +21,7 @@ public class Main extends Application {
         loader.setRoot(root);
         primaryStage.setTitle("Circular Plasmid Viewer");
         primaryStage.setScene(new Scene(root));
+        primaryStage.setFullScreen(true);
         primaryStage.show();
     }
 }

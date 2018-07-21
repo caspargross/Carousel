@@ -6,13 +6,8 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.CacheHint;
-import javafx.scene.Group;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import javafx.scene.transform.Transform;
 import javafx.stage.FileChooser;
 import main.model.CircularParser;
@@ -20,7 +15,13 @@ import main.model.Read;
 import main.view.CircularView;
 import main.view.GlobalInformation;
 import playground.Coordinate;
-import sun.plugin.javascript.navig.Anchor;
+import javafx.scene.Scene;
+import javafx.scene.image.WritableImage;
+import java.awt.image.BufferedImage;
+import javafx.embed.swing.SwingFXUtils;
+import javax.imageio.ImageIO;
+import java.io.IOException;
+
 
 import java.io.File;
 import java.util.List;
@@ -31,11 +32,81 @@ public class FxmlController {
     private Pane mainPane;
 
     @FXML
+    void menuOpenFasta (ActionEvent e) {
+
+        FileChooser fc = new FileChooser();
+        fc.setTitle("OpenBamFile");
+
+
+        // Set extension filter
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("FASTA files (*.fasta)", "*.fasta");
+        fc.getExtensionFilters().add(extFilter);
+
+        // Show open file dialog
+        File myFasta = fc.showOpenDialog(null);
+        if(myFasta != null) {
+            System.out.println("File Open Button pressed");
+            System.out.println(myFasta.toString());
+            //code to load the bam file and do sth meaningful with it
+        }
+    }
+
+
+
+
+
+
+    @FXML
+    void menuSaveImage (ActionEvent e) {
+
+        FileChooser fc = new FileChooser();
+        fc.setTitle("OpenBamFile");
+
+
+        // Set extension filter
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("PNG files (*.png)", "*.png");
+        fc.getExtensionFilters().add(extFilter);
+
+        // Show open file dialog
+        File myImage = fc.showSaveDialog(null);
+        if(myImage != null) {
+            System.out.println("Save Button pressed");
+            Scene scene = mainPane.getScene(); //.snapshot();
+            WritableImage img = new WritableImage((int) scene.getWidth() + 1, (int) scene.getHeight() + 1);
+            scene.snapshot(img);
+
+            BufferedImage bImage = SwingFXUtils.fromFXImage(img, null);
+            try {
+                ImageIO.write(bImage, "png", myImage);
+            } catch (IOException e2) {
+                throw new RuntimeException(e2);
+            }
+        }
+
+    }
+
+
+    @FXML
     void menuOpenBam (ActionEvent e) {
-        //FileChooser fc = new FileChooser();
-        //fc.setTitle("OpenBamFile");
-        //File myBam = fc.showOpenDialog(null);
-        System.out.println("File Open Button pressed");
+
+        FileChooser fc = new FileChooser();
+        fc.setTitle("OpenBamFile");
+
+
+        // Set extension filter
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("BAM files (*.bam)", "*.bam");
+        fc.getExtensionFilters().add(extFilter);
+
+        // Show open file dialog
+        File myBam = fc.showOpenDialog(null);
+        if(myBam != null) {
+            System.out.println("File Open Button pressed");
+            System.out.println(myBam.toString());
+            //code to load the bam file and do sth meaningful with it
+        }
     }
 
     @FXML
