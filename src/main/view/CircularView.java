@@ -76,6 +76,7 @@ public class CircularView {
 
             }
         });
+        System.out.println(levelArrayAsInteger.length);
         printLevelArrayforDebugging();
         //checkIfLevelArrayisCorrect();
     }

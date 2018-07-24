@@ -34,7 +34,7 @@ public class MainView extends AnchorPane {
     //private LabelView labelView;
     private double downX;
     private double downY;
-
+    private boolean firstParse= true;
     public ArrayList<Point2D> getPoint2DArrayList() {
         return point2DArrayList;
     }
@@ -44,18 +44,20 @@ public class MainView extends AnchorPane {
 
 
         CircularParser.Reads.getReadsSorted().addListener((ListChangeListener)(c -> {
-            constructCircularView(CircularParser.Reads.getReadsSorted());//TODO: not empty the list of the circular parser x)
-            setupZoom(); //TODO: Currently this is here because gInfo doesnt exist beforehand.Yet the necesssary information (radius, center is propably predertmined in our application anyway. IF thats decided we can move this part back in the constructor
+            if (!firstParse) {
+                this.getChildren().remove(0, this.getChildren().size());
+                constructCircularView(CircularParser.Reads.getReadsSorted());
+            }
+
+            if (firstParse) {
+                constructCircularView(CircularParser.Reads.getReadsSorted());
+                setupZoom(); //TODO: Currently this is here because gInfo doesnt exist beforehand.Yet the necesssary information (radius, center is propably predertmined in our application anyway. IF thats decided we can move this part back in the constructor
+                firstParse = false;
+            }
         }
         ));
         setupRotate();
         this.setStyle("-fx-background-color : White");
-        setupTestCacheKeys();
-        requestFocus();
-
-
-
-
 
     }
     private void constructCircularView( ObservableList< List< Read > > listOfReadLists){
