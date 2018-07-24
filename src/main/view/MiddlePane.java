@@ -1,6 +1,7 @@
 package main.view;
 
 import javafx.scene.CacheHint;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.text.Text;
 
@@ -28,5 +29,10 @@ public class MiddlePane extends AnchorPane {
             mainView.setTranslateY(mainView.getTranslateY()+DeltaY/2);
         });
     }
-
+    public void CacheTempSpeed(){
+        mainView.CacheTempSpeed();
+    }
+    public void CacheTempQuality(){
+        mainView.CacheTempQuality();
+    }
 }

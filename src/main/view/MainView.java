@@ -4,7 +4,10 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Point2D;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Arc;
@@ -47,7 +50,8 @@ public class MainView extends AnchorPane {
         ));
         setupRotate();
         this.setStyle("-fx-background-color : White");
-
+        setupTestCacheKeys();
+        requestFocus();
 
 
 
@@ -128,7 +132,6 @@ public class MainView extends AnchorPane {
         });
         this.setOnMouseDragged((me)->{
 
-            //circularView.enableCacheOfReadViews();
             double deltaX = me.getSceneX()-downX;
             double deltaY = me.getSceneY()-downY;
             double angle = Math.toRadians(deltaX*20);
@@ -136,12 +139,35 @@ public class MainView extends AnchorPane {
             this.getTransforms().add(rotate);
             downX = me.getSceneX();
             ViewHelper.rotationValue.setValue(ViewHelper.rotationValue.getValue()+angle);
-            //System.out.println(ViewHelper.rotationValue.getValue());
 
         });
     }
 
+    private void setupTestCacheKeys(){
+        System.out.println("setting up cachetestkeys");
+        this.setOnKeyTyped(ke->{
+            System.out.println("key was pressed");
+            KeyCode keyCode = ke.getCode();
+            if(keyCode.equals(KeyCode.S)){
+                System.out.println("S PRESSED");
+                return;
+            }
+        });
+    }
+    public void CacheTempSpeed(){
+        //circularView.disableCacheOfReadViews();
+        circularView.cacheToQuality();
+        circularView.cacheToSpeed();
+        circularView.cacheToQuality();
+        circularView.cacheToSpeed();
+        //circularView.enableCacheOfReadViews();
+    }
 
+    public void CacheTempQuality(){
+        //circularView.disableCacheOfReadViews();
+        circularView.cacheToQuality();
+        //circularView.enableCacheOfReadViews();
+    }
 
 
 }

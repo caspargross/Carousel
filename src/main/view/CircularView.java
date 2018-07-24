@@ -1,7 +1,9 @@
 package main.view;
 
+import javafx.beans.value.ObservableListValue;
 import javafx.collections.ObservableList;
 import javafx.scene.CacheHint;
+import jdk.internal.util.xml.impl.Input;
 import main.model.Read;
 
 import java.util.ArrayList;
@@ -53,11 +55,13 @@ public class CircularView {
     /**
      * Creates a CircularView, creates a levelArray with a different method since this method is given a different datatype.
      * No testing available, will propably throw tons of errors..
-     * @param listOfReadLists
+     * @param listOfReadListsInput
      * @param info
      */
 
-    public CircularView(ObservableList< List< Read > >  listOfReadLists, GlobalInformation info){
+    public CircularView(ObservableList< List< Read > >  listOfReadListsInput, GlobalInformation info){
+        ObservableList< List< Read > >  listOfReadLists;
+        listOfReadLists=listOfReadListsInput;
         printGivenReadList(listOfReadLists);
         this.info = new GlobalInformation(info.getCenter(),info.getRadius(),info.height.getValue(),info.getGlobalLength());
         readViews = new ReadView[calcReadCount(listOfReadLists)];
@@ -353,9 +357,11 @@ public class CircularView {
         }
     }
     public void cacheToQuality(){
+        System.out.println("setting to quality in progress");
         for(ReadView rW: readViews){
             rW.getArchSegment().getInner().setCacheHint(CacheHint.QUALITY);
         }
+        System.out.println("done");
     }
     public void cacheToSpeed(){
         for(ReadView rW:readViews){
