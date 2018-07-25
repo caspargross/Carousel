@@ -16,9 +16,6 @@ public class ArchSegment {
     /**
      * The Visual Elements, self explanatory
      */
-    private Line start = new Line();
-    private Line stop = new Line();
-    private Arc outer = new Arc();
     private Arc inner = new Arc();
 
     /**
@@ -28,18 +25,6 @@ public class ArchSegment {
     private boolean isGapcloser,isReversed;
     private int alignmentStart, alignmentEnd,readLength,level;
     private GlobalInformation info;
-
-    /**
-     * helper function to get the proper ReadLength of a gapClosing read. TODO: Delete if read.java has a working implementation of getLength
-     */
-    private void calculateReadLengthOfCircularRead(){
-        if(isGapcloser){
-            readLength = alignmentEnd+ ((int)info.getGlobalLength()-alignmentStart);
-        }
-        else{
-            readLength = alignmentEnd-alignmentStart;
-        }
-    }
 
     /**
      * helper function to determine our standard color of the Read. (Gapclosers => RED, Reversed Reads => BLUE, else => BLACK(
@@ -59,10 +44,8 @@ public class ArchSegment {
      */
     public void setStrokeWidth(double newValue){
         double width = newValue/10;
-        start.setStrokeWidth(width);
-        stop.setStrokeWidth(width);
         inner.setStrokeWidth(width);
-        outer.setStrokeWidth(width);
+
     }
 
     /**
@@ -70,10 +53,8 @@ public class ArchSegment {
      * @param color the Color the archsegment is to be set
      */
     public void setColor(Color color){
-        start.setStroke(color);
-        stop.setStroke(color);
         inner.setStroke(color);
-        outer.setStroke(color);
+
     }
 
     /**
@@ -83,49 +64,6 @@ public class ArchSegment {
     public void updateHeight(double height){
         //calculate the effective radius based on height,level,radius
         double effradius = info.getRadius()+ level*height + height/2;
-        //do Math to create Points A,B,C,D.
-        //Convention: if direction is true (clockwise) the created ArchSegment looks like this:
-        //              B-  -   -   _   _
-        //            /                      -    -  D
-        //           A  -      -    _               /
-        //                               -     -  C
-        // if direction is false Line CD is left from AD
-/*
-        Coordinate A = new Coordinate(effradius*Math.cos(Math.toRadians((alignmentStart/info.getGlobalLength())*360)),effradius*Math.sin(Math.toRadians((alignmentStart/info.getGlobalLength())*360)));
-        Coordinate B = new Coordinate((effradius+info.getHeight())*Math.cos(Math.toRadians((alignmentStart/info.getGlobalLength())*360)),(effradius+info.getHeight())*Math.sin(Math.toRadians((alignmentStart/info.getGlobalLength())*360)));
-        Coordinate C = new Coordinate(effradius*Math.cos(Math.toRadians(((alignmentStart+readLength)/info.getGlobalLength())*360)),effradius * (Math.sin(Math.toRadians(((alignmentStart+readLength)/info.getGlobalLength())*360))));
-        Coordinate D = new Coordinate((effradius+info.getHeight())*Math.cos(Math.toRadians(((alignmentStart+readLength)/info.getGlobalLength())*360)),(effradius+info.getHeight()) * (Math.sin(Math.toRadians(((alignmentStart+readLength)/info.getGlobalLength())*360))));
-
-        // Now Add the Center to the Coordinates
-        A.add(info.getCenter());
-        B.add(info.getCenter());
-        C.add(info.getCenter());
-        D.add(info.getCenter());
-
-        // All 4 Coordinates are finished, time to setup the Lines+Arcs
-        // NOTE: ARC Degrees work counterclockwise (rising) -> start needs to be the "stop" and 90° = 15k label
-
-
-        start.setStartX(A.getX());
-        start.setStartY(A.getY());
-        start.setEndX(B.getX());
-        start.setEndY(B.getY());
-        stop.setStartX(C.getX());
-        stop.setStartY(C.getY());
-        stop.setEndX(D.getX());
-        stop.setEndY(D.getY());
-
-        start.setStroke(archColor);
-        stop.setStroke(archColor);
-
-        outer.setCenterX(info.getCenter().getX());
-        outer.setCenterY(info.getCenter().getY());
-        outer.setRadiusX(effradius+info.getHeight());
-        outer.setRadiusY(effradius+info.getHeight());
-        outer.setStartAngle(((info.getGlobalLength()-alignmentStart)/info.getGlobalLength())*360);
-        outer.setLength((readLength/info.getGlobalLength())*-360);
-        outer.setStroke(archColor);
-        outer.setFill(Color.TRANSPARENT);*/
 
         inner.setCenterX(info.getCenter().getX());
         inner.setCenterY(info.getCenter().getY());
@@ -156,10 +94,9 @@ public class ArchSegment {
         this.alignmentStart =read.getAlignmentStart(); //TODO: Check if thos need both to be decremented by 1 or not
         this.alignmentEnd = read.getAlignmentEnd();
         this.level = level;
-        calculateReadLengthOfCircularRead();
+        this.readLength = read.getAlignmentLength();
         determinteStandardColor();
         updateHeight(info.getHeight());
-        //setStrokeWidth(2);
 
     }
 
@@ -171,27 +108,4 @@ public class ArchSegment {
         return inner;
     }
 
-    /**
-     * Getter for the Outer Arc
-     * @return returns the Outer Arc of the ArchSegment
-     */
-    public Arc getOuter() {
-        return outer;
-    }
-
-    /**
-     * Getter for the first Line(at read.start (regardless of circular or not)
-     * @return returns the first Line, regardless of isCircular is always located at Read.AlignmentStart
-     */
-    public Line getStart() {
-        return start;
-    }
-
-    /**
-     * Getter for the second Line(at read.end (regardless of circular or not)
-     * @return returns the second Line, regardless of isCircular is always located at Read.AlignmentEnd
-     */
-    public Line getStop() {
-        return stop;
-    }
 }

@@ -1,9 +1,6 @@
 package main.view;
 
-import javafx.scene.CacheHint;
-import javafx.scene.input.KeyCode;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.text.Text;
 
 public class MiddlePane extends AnchorPane {
     private MainView mainView;
@@ -34,5 +31,7 @@ public class MiddlePane extends AnchorPane {
     }
     public void CacheTempQuality(){
         mainView.CacheTempQuality();
+    }
+    public void EnableCache(){ mainView.EnableCache();
     }
 }

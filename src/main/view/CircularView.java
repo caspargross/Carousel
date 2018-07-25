@@ -1,9 +1,7 @@
 package main.view;
 
-import javafx.beans.value.ObservableListValue;
 import javafx.collections.ObservableList;
 import javafx.scene.CacheHint;
-import jdk.internal.util.xml.impl.Input;
 import main.model.Read;
 
 import java.util.ArrayList;
@@ -72,7 +70,7 @@ public class CircularView {
         this.info.height.addListener((observable, oldValue, newValue) -> {
             for(int i =0; i < readViews.length;i++){
                 readViews[i].updateHeight((double)newValue);
-                readViews[i].updateStrokeWidth((double)newValue);
+                //readViews[i].updateStrokeWidth((double)newValue);
 
             }
         });

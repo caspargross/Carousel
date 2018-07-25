@@ -1,13 +1,8 @@
-
-
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.SceneAntialiasing;
 import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import main.model.CircularParser;
-import main.view.CircularView;
-import main.view.MainView;
 import main.view.MiddlePane;
 
 import java.io.File;
@@ -18,7 +13,7 @@ public class ProperMainViewTest extends Application{
     public void start( Stage primaryStage ) throws Exception {
         MiddlePane mainView = new MiddlePane();
         primaryStage.setTitle("Proper Test of the MainView Class");
-        Scene cacheTest = new Scene( mainView,mainView.getWidth(),mainView.getHeight(),true,SceneAntialiasing.DISABLED);
+        Scene cacheTest = new Scene( mainView,mainView.getWidth(),mainView.getHeight());
         primaryStage.setScene(cacheTest);
         primaryStage.show( );
         mainView.setOnMousePressed((me) ->{
@@ -39,6 +34,9 @@ public class ProperMainViewTest extends Application{
             if(keyCode.equals(KeyCode.Q)){
                 System.out.println("setting cache to quality");
                 mainView.CacheTempQuality();
+            }
+            if(keyCode.equals(KeyCode.E)){
+                mainView.EnableCache();
             }
         });
 
