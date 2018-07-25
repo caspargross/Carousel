@@ -20,6 +20,7 @@
 
 
 <?import javafx.scene.Group?>
+<?import main.view.MainView?>
 <VBox prefHeight="1000.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controller.FxmlController">
 <children>
     <MenuBar VBox.vgrow="NEVER">
@@ -96,8 +97,8 @@
                     </TitledPane>
                 </panes>
             </Accordion>
-            <AnchorPane fx:id="mainPane" >
-            </AnchorPane>
+            <MainView fx:id="mainPane" >
+            </MainView>
             <AnchorPane maxWidth="200.0" minWidth="200.0" prefHeight="200.0" prefWidth="200.0" />
         </items>
     </SplitPane>

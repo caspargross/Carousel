@@ -13,6 +13,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.transform.Transform;
 import javafx.stage.FileChooser;
+import main.Main;
 import main.model.CircularParser;
 import main.model.Read;
 import main.view.CircularView;
@@ -41,7 +42,7 @@ public class FxmlController {
     // FXML Elements
 
     @FXML
-    private AnchorPane mainPane;
+    private MainView mainPane;
 
     @FXML
     void menuOpenFasta (ActionEvent e) {
@@ -86,8 +87,7 @@ public class FxmlController {
         File myImage = fc.showSaveDialog(null);
         if(myImage != null) {
             System.out.println("Save Button pressed");
-            Scene scene = mainPane.getScene(); //.snapshot();
-            WritableImage img = new WritableImage((int) scene.getWidth() + 1, (int) scene.getHeight() + 1);
+            WritableImage img = new WritableImage((int) mainPane.getWidth() + 1, (int) mainPane.getHeight() + 1);
 
             SnapshotParameters snParams = new SnapshotParameters();
             mainPane.snapshot(snParams, img);
@@ -153,8 +153,7 @@ public class FxmlController {
 
     private void startView() throws Exception {
 
-        this.mainPane.setStyle("-fx-background-color: #ffffff");
-        this.mainPane.getChildren().addAll(new MainView( ));
+        //this.mainPane.setStyle("-fx-background-color: #ffffff");
 
         String baiFileName = bamFile.getAbsolutePath();
         baiFileName = baiFileName.replace(".bam", ".bai");
