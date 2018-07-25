@@ -3,6 +3,8 @@ package main.view;
 import javafx.application.Platform;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.value.ObservableListValue;
+import javafx.collections.FXCollections;
 import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Task;
@@ -37,22 +39,22 @@ public class MainView extends AnchorPane {
     private boolean firstParse= true;
     private boolean secondWindow = false;
     private Stage secondStage;
-    public ArrayList<Point2D> getPoint2DArrayList() {
-        return point2DArrayList;
-    }
-
+    private ObservableList< List< Read > > data;
     private ArrayList<Point2D> point2DArrayList = new ArrayList<Point2D>();
     public MainView(){
 
 
         CircularParser.Reads.getReadsSorted().addListener((ListChangeListener)(c -> {
+            grabData(CircularParser.Reads.getReadsSorted());
+
             if (!firstParse) {
+
                 this.getChildren().remove(0, this.getChildren().size());
-                constructCircularView(CircularParser.Reads.getReadsSorted());
+                constructCircularView(data);
             }
 
             if (firstParse) {
-                constructCircularView(CircularParser.Reads.getReadsSorted());
+                constructCircularView(data);
                 setupZoom(); //TODO: Currently this is here because gInfo doesnt exist beforehand.Yet the necesssary information (radius, center is propably predertmined in our application anyway. IF thats decided we can move this part back in the constructor
                 firstParse = false;
             }
@@ -64,11 +66,13 @@ public class MainView extends AnchorPane {
     }
     private void constructCircularView( ObservableList< List< Read > > listOfReadLists){
         int referenceLength = CircularParser.ReferenceSequences.getCurrentReferenceSequenceLength();
+
         //GlobalInformation gInfo = new GlobalInformation(referenceLength);
-        System.out.println("ReferenceLength of "+CircularParser.ReferenceSequences.getCurrentReferenceSequenceLength());
         System.out.println("List Changed");
+        System.out.println("ReferenceLength of "+CircularParser.ReferenceSequences.getCurrentReferenceSequenceLength());
+
         DoubleProperty height = new SimpleDoubleProperty(2.5);
-        Coordinate center = new Coordinate(700,400);
+        Coordinate center = new Coordinate(800,500);
         GlobalInformation gInfo = new GlobalInformation(center,100,height.getValue(),referenceLength);
         circularView = new CircularView(listOfReadLists,gInfo);
         //circularView.enableCacheOfReadViews();
@@ -132,7 +136,7 @@ public class MainView extends AnchorPane {
                 //circularView.info.height.setValue(circularView.info.height.getValue()*1.4);
 
             }
-            if(ViewHelper.scaleCount.getValue() >= 7){
+            if(ViewHelper.scaleCount.getValue() >= 70){
                 System.out.println("entered the case where a new thread is gonna start");
                 openNewSceneWithGivenPane(testRenderInNewScene());
             }
@@ -151,7 +155,7 @@ public class MainView extends AnchorPane {
             double deltaX = me.getSceneX()-downX;
             double deltaY = me.getSceneY()-downY;
             double angle = Math.toRadians(deltaX*20);
-            Rotate rotate = new Rotate(angle,700,400);
+            Rotate rotate = new Rotate(angle,800,500);
             //this.getTransforms().add(this.getTransforms().get(0).createConcatenation(rotate));
             this.getTransforms().add(rotate);
             downX = me.getSceneX();
@@ -249,6 +253,23 @@ public class MainView extends AnchorPane {
             }
 
 
+    }
+    public void grabData(ObservableList<List<Read>>temp){
+        //this.data = FXCollections.observableArrayList(CircularParser.Reads.getReadsSorted());
+        data = FXCollections.observableArrayList();
+
+
+        for (List<Read> listOfRead:temp){
+            ArrayList<Read> tempArray = new ArrayList<>();
+            data.add(new ArrayList<>(listOfRead));
+        }
+
+        //this.data= FXCollections.observableArrayList(temp);
+        //System.out.println(CircularParser.Reads.getReadsSorted().toString());
+
+        //System.out.println(data.toString());
+        //System.out.println(CircularParser.Reads.getReadsSorted().toString());
+        //FXCollections.copy(data,CircularParser.Reads.getReadsSorted());
     }
 
 }

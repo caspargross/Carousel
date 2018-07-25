@@ -18,6 +18,7 @@ import main.model.Read;
 import main.view.CircularView;
 import main.view.GlobalInformation;
 import main.view.MainView;
+import main.view.MiddlePane;
 import playground.Coordinate;
 import javafx.scene.image.WritableImage;
 import java.awt.image.BufferedImage;
@@ -154,7 +155,8 @@ public class FxmlController {
     private void startView() throws Exception {
 
         this.mainPane.setStyle("-fx-background-color: #ffffff");
-        this.mainPane.getChildren().addAll(new MainView( ));
+        this.mainPane.getChildren().clear();
+        this.mainPane.getChildren().add(new MiddlePane());
 
         String baiFileName = bamFile.getAbsolutePath();
         baiFileName = baiFileName.replace(".bam", ".bai");
