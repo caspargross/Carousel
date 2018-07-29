@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2018 Mauro Di Girolamo
  */
 
@@ -47,7 +47,7 @@ public class PositionSpecificReadCoverage {
      * @return PositionSpecificReadCoverage.totalReadsAlignedAmount
      */
     public int getTotalReadsAlignedAmount( ) {
-        return getTotalReadsAlignedAmount( );
+        return totalReadsAlignedAmount;
     }
 
 
@@ -64,7 +64,7 @@ public class PositionSpecificReadCoverage {
      * Computes the position specific read coverage given a BAM file and saves it into the positionSpecificReadAmount
      * attribute while also setting currentReadAmount to the total amounts of reads aligned.
      *
-     * @param bamFile
+     * @param bamFile the BAM file to compute the position specific read coverage from
      *
      * @throws IOException
      */

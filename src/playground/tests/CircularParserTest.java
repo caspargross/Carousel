@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2018 Mauro Di Girolamo
  */
 
@@ -21,7 +21,7 @@ public class CircularParserTest {
     /**
      * The files to be used in the test. If necessary, feel free to adjust them to fit your needs.
      */
-    private static File referenceSequenceFile = new File( "./data/p7_ref.fasta" ),
+    private final static File referenceSequenceFile = new File( "./data/p7_ref.fasta" ),
             readsFile = new File( "./data/p7_mapped.bam" ),
             indexFile = new File( "./data/p7_mapped.bai" );
 
@@ -98,13 +98,13 @@ public class CircularParserTest {
     };
 
     /**
-     * Tests CircularParser.Reads.hide( ) using the CircularParser.Reads.Order.CircularThenRandom order.
+     * Tests CircularParser.Reads.hide( ) using the CircularParser.Reads.Order.CrossBorderBeforeRandom order.
      */
-    private static TestCase hideReadsCircularThenRandom = new TestCase( ) {
+    private static TestCase hideReadsCrossBorderBeforeRandom = new TestCase( ) {
         /**
-         * The amount of reads to hide in the test.
+         * The amount of reads to show.
          */
-        private float amountToHide = 0.994f;
+        private final int amountToShow = 300;
 
         /**
          * Overrides TestCase.perform( ).
@@ -114,7 +114,7 @@ public class CircularParserTest {
             CircularParser.parse( referenceSequenceFile, readsFile, indexFile );
             int[] readCounts = countReadsParsed( );
             System.out.println( "Before hiding: " + readCounts[ 0 ] + " of " + readCounts[ 1 ] + " reads are circular." );
-            CircularParser.Reads.hide( amountToHide, CircularParser.Reads.Order.CrossBorderBeforeRandom );
+            CircularParser.Reads.setAmountOfReadsShown( amountToShow, CircularParser.Reads.Order.CrossBorderBeforeRandom );
             readCounts = countReadsParsed( );
             System.out.println( "After hiding: " + readCounts[ 0 ] + " of " + readCounts[ 1 ] + " reads are circular." );
         }
@@ -139,7 +139,7 @@ public class CircularParserTest {
     /**
      * The test which should be performed.
      */
-    private static TestCase testCaseToPerform = outputReferenceSequencesIdentifiers;
+    private static TestCase testCaseToPerform = compareExecutionTime;
 
 
     /**

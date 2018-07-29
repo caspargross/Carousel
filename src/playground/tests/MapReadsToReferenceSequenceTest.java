@@ -1,6 +1,8 @@
-/**
+/*
  * Copyright (C) 2018 Mauro Di Girolamo
  */
+
+package playground.tests;
 
 import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
@@ -24,7 +26,7 @@ public class MapReadsToReferenceSequenceTest {
     /**
      * The files to be used in the test. If necessary, feel free to adjust them to fit your needs.
      */
-    private static File referenceSequenceFile = new File( "./data/p7_ref.fasta" ),
+    private final static File referenceSequenceFile = new File( "./data/p7_ref.fasta" ),
             readsFile = new File( "./data/reads.fastq" ),
             outputFile = new File( "result" ); // Please note that outputFile should not contain a file ending, since these will be added by the method, because two files with different file endings, .bam and .bai, will be created.
 

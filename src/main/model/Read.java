@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2018 Mauro Di Girolamo
  */
 
@@ -277,7 +277,7 @@ public class Read {
     /**
      * A Random generator for the definition of Read.createNewReadFromSAMRecord( ).
      */
-    private static Random random = new Random( );
+    private static Random random = new Random( 1 );
 
     /**
      * Creates a new Read object given a SAMRecord representation of the Read.
@@ -294,7 +294,7 @@ public class Read {
             do
                 randomNumber = random.nextInt( );
             while( randomIDsAssigned.contains( randomNumber ) );
-            return new Read( randomNumber, record.getReadName( ), record.getAlignmentStart( ), record.getAlignmentEnd( ), record.getReadLength( ), record.getMappingQuality( ), record.getReadNegativeStrandFlag( ), record.getReadString( ), record.getCigar( ) );
+            return new Read( randomNumber, record.getReadName( ), record.getAlignmentStart( ), record.getAlignmentEnd( ), record.getAlignmentEnd( ) - record.getAlignmentStart( ) + 1, record.getMappingQuality( ), record.getReadNegativeStrandFlag( ), record.getReadString( ), record.getCigar( ) );
         }
     }
 

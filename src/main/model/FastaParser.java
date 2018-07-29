@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2018 Mauro Di Girolamo
  */
 
@@ -22,7 +22,7 @@ public class FastaParser {
     /**
      * The prefix of headers used in FASTA files.
      */
-    private static char headerPrefix = '>';
+    private static final char headerPrefix = '>';
 
 
     /**
