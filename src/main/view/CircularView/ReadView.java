@@ -1,6 +1,7 @@
-package main.view;
+package main.view.CircularView;
 
 import main.model.Read;
+import main.view.Helper.GlobalInformation;
 
 /**
  * Class consisting of a Read and through initializing an archSegment.
@@ -19,7 +20,7 @@ public class ReadView {
      * @param info the information of the reference and general drawing information (center, radius..)
      * @param level the level the read is going to be placed in the ring
      */
-    public ReadView(Read read, GlobalInformation info,int level){
+    public ReadView(Read read, GlobalInformation info, int level){
         this.read = read;
         this.archSegment = new ArchSegment(read,info,level);
     }

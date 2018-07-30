@@ -2,7 +2,7 @@ package main.view;
 
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
-import main.Main;
+import main.view.LabelView.LabelView;
 
 /**
  * Class that wraps the MainView, since rescaling behaved highly weirdly when this was not done (high fluctations of the height /width properties)

@@ -1,4 +1,4 @@
-package main.view;
+package main.view.Helper;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -12,20 +12,10 @@ import main.model.CircularParser;
 public class GlobalInformation {
     private Coordinate center;
     private double radius;
-    public DoubleProperty height= new SimpleDoubleProperty();
+    public DoubleProperty height;
     private int referenceLength;
-    private double rotation = 0.0; //TODO: Currently rotation for the Scroll-calculation is in Globalinformation. This is only used for the main so it should go back to as a global variable?
+    private double rotation = 0.0;
 
-
-
-    //TODO: Constructor right now needs a lot of inputs, that can be easily calculated from a given referenceLength(global Length). Can´t be changed right now because Standard Zoom is still WIP
-    //CONSTRUCTOR
-    public GlobalInformation(Coordinate center, double radius, double height, int referenceLength){
-        this.center = new Coordinate(center.getX(),center.getY());
-        this.radius=radius;
-        this.height.setValue(height);
-        this.referenceLength = referenceLength;
-    }
 
     /**
      * Different Approach:

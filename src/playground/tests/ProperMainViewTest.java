@@ -3,6 +3,7 @@ package playground.tests;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import main.model.CircularParser;
 import main.view.MiddlePane;
@@ -45,6 +46,7 @@ public class ProperMainViewTest extends Application{
 
     //Change here if you want to parse with reference + bai + bam or a different file genereally
     public void parseBam()throws  Exception{
+
         final File referenceSequencesFileToTest = new File( "./data/p7_ref.fasta" ),
                    BAMFileToTest = new File( "./data/p7_mapped.bam" ),
                    BAIFileToTest = new File( "./data/p7_mapped.bai" );

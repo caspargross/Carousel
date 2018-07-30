@@ -15,9 +15,9 @@ import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.scene.Scene;
 import main.model.Read;
-import main.view.CircularView;
-import main.view.GlobalInformation;
-import main.view.Coordinate;
+import main.view.CircularView.CircularView;
+import main.view.Helper.GlobalInformation;
+import main.view.Helper.Coordinate;
 
 import java.util.List;
 
@@ -47,7 +47,7 @@ public class MainViewTest extends Application {
         }
         DoubleProperty height = new SimpleDoubleProperty(2);
         Coordinate center = new Coordinate(450,450);
-        GlobalInformation gInfo = new GlobalInformation(center,100,height.getValue(),referenceLength);
+        GlobalInformation gInfo = new GlobalInformation();
         CircularView circularView = new CircularView(temp,gInfo);
         System.out.println(circularView.getReadViews().length);
         for (int i = 0; i <circularView.getReadViews().length; i++){

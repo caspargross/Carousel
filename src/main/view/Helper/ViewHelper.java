@@ -1,4 +1,4 @@
-package playground;
+package main.view.Helper;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -7,8 +7,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.text.Text;
 import javafx.scene.transform.Scale;
 import main.model.Read;
-import main.view.Coordinate;
-import main.view.GlobalInformation;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,4 +1,4 @@
-package main.view;
+package main.view.LabelView;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
@@ -6,9 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.layout.AnchorPane;
 import main.model.CircularParser;
-import playground.ViewHelper;
-
-import javax.swing.text.View;
+import main.view.Helper.ViewHelper;
 
 public class LabelView extends AnchorPane {
     public LabelView(){

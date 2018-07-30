@@ -1,9 +1,10 @@
-package main.view;
+package main.view.CircularView;
 
 import javafx.scene.CacheHint;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
 import main.model.Read;
+import main.view.Helper.GlobalInformation;
 
 /**
  * Class that represents a single Read visually. For circular viewing purposes this class contains 2 Lines and 2 Arcs.
