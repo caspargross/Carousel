@@ -4,7 +4,7 @@ import main.model.Read;
 
 /**
  * Class consisting of a Read and through initializing an archSegment.
- * contains Getter for the ArchSegment&Read  +  functions to updateHeight&StrokeWidth of the archsegment,
+ * contains Getter for the ArchSegment+Read  +functions to updateHeight+StrokeWidth of the archsegment
  * @author Felix
  */
 public class ReadView {

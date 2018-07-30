@@ -69,6 +69,7 @@ public class MainView extends AnchorPane {
             Arc temp = circularView.getReadViews()[i].getArchSegment().getInner();
             this.getChildren().add(temp);
         }
+       this.getChildren().add(new TickmarkView(gInfo));
     }
 
     /**
@@ -96,7 +97,7 @@ public class MainView extends AnchorPane {
                 ViewHelper.scaleCount.setValue(ViewHelper.scaleCount.getValue()+1);
                 this.getTransforms().add(zoom);
                 //Change the height
-               //circularView.info.height.setValue(circularView.info.height.getValue()*(1/1.4));
+               circularView.info.height.setValue(circularView.info.height.getValue()*(1/1.4));
                 Pane tempPane = new Pane();
                 if(18 / (1.5 * ViewHelper.scaleCount.getValue())>= 1) {
                     Line[] tempLineArray = ViewHelper.circleOfTickmarks(circularView.info, 10 / (1.5 * ViewHelper.scaleCount.getValue()), (int) (18 / (1.5 * ViewHelper.scaleCount.getValue())));
@@ -105,7 +106,7 @@ public class MainView extends AnchorPane {
                     }
                 }
                 ViewHelper.tickmarkList.add(tempPane);
-                this.getChildren().add(tempPane);
+                //this.getChildren().add(tempPane);
 
             }
             else if (se.getDeltaY() >0&& ViewHelper.scaleCount.getValue()<0){
@@ -120,12 +121,12 @@ public class MainView extends AnchorPane {
             }
             else if(se.getDeltaY()<0 && ViewHelper.scaleCount.getValue()>0) {
                 ViewHelper.scaleCount.setValue(ViewHelper.scaleCount.getValue() - 1);
-                this.getChildren().remove(ViewHelper.tickmarkList.get(ViewHelper.tickmarkList.size()-1));
+                //this.getChildren().remove(ViewHelper.tickmarkList.get(ViewHelper.tickmarkList.size()-1));
                 ViewHelper.tickmarkList.remove(ViewHelper.tickmarkList.size()-1);
                 this.getTransforms().remove(ViewHelper.scaleList.get(ViewHelper.scaleList.size() - 1));
                 ViewHelper.scaleList.remove(ViewHelper.scaleList.size() - 1);
                 //Change the height
-                //circularView.info.height.setValue(circularView.info.height.getValue()*1.4);
+                circularView.info.height.setValue(circularView.info.height.getValue()*1.4);
 
             }
         });

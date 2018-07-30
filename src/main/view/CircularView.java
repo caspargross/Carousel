@@ -54,7 +54,7 @@ public class CircularView {
 
     /**
      * Creates a CircularView, creates a levelArray with a different method since this method is given a different datatype.
-     * Adds a Listener on the Height-property of the GlobalInformation - if that happens to change (e.g when zooming) -> we adjust each arch´s strokewidth and their placement
+     * Adds a Listener on the Height-property of the GlobalInformation - if that happens to change (e.g when zooming) we adjust each arch´s strokewidth and their placement
      * @param listOfReadLists data from our model about the Reads, for information regarding the structure visit the CircularParser class
      * @param info globalInformation with center/radius/base height/referenceLength
      */
@@ -285,6 +285,9 @@ public class CircularView {
         return levelArray;
     }
 
+    /**
+     * generic print-function for debugging-Purposes
+     */
     public void printLevelArrayforDebugging(){
         int currentLevel = 0;
         String[] printText = new String[levelArrayAsInteger[levelArrayAsInteger.length-1]+1];
@@ -304,6 +307,9 @@ public class CircularView {
             System.out.println(s);
         }
     }
+    /**
+     * generic print-function for debugging-Purposes
+     */
     public void checkIfLevelArrayisCorrect(){
         int currentLevel = 0;
         int currentEnd = 0;
