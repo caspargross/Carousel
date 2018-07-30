@@ -517,7 +517,7 @@ public class CircularParser {
      * Constructs a cross-border read given two presentations of the same read aligned fittingly such that one overlaps
      * at the beginning and the other one at the end. Updates alignmentStart / getAlignmentEnd, builds a new fitting
      * Cigar combing the two old ones and transfers the sequence from the newReadRecord if the oldRead is hard clipped.
-     * After applying the algorithm, ( Read is combined &lt;=&gt; read.alignmentStart &gt; read.alignmentEnd ) holds.
+     * After applying the algorithm, <pre>{@code ( Read is combined <=> read.alignmentStart > read.alignmentEnd )}</pre> holds.
      *
      * @param oldRead       the read which was already seen by the CircularParser
      * @param newReadRecord the new read found in the BAM record
