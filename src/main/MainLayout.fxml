@@ -2,13 +2,11 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Accordion?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TitledPane?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -17,55 +15,28 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
-
-
-<?import javafx.scene.Group?>
 <?import main.view.MainView?>
+
 <VBox prefHeight="1000.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controller.FxmlController">
 <children>
     <MenuBar VBox.vgrow="NEVER">
         <menus>
-            <Menu mnemonicParsing="false" text="Input">
+            <Menu fx:id="menu" mnemonicParsing="false" text="Menu">
                 <items>
-                    <Menu mnemonicParsing="false" text="Open Bam/Sam Files">
-                        <items>
-                            <MenuItem mnemonicParsing="false" text="File Chooser SAM/BA" onAction="#menuOpenBam"></MenuItem>
-                            <MenuItem mnemonicParsing="false" text="File Chooser Fasta" onAction="#menuOpenFasta"/>
-
-                        </items>
-                    </Menu>
-                    <Menu mnemonicParsing="false" text="Map Reads">
-                        <items>
-                            <MenuItem mnemonicParsing="false" text="File Chooser References" />
-                        </items>
-                    </Menu>
-                    <Menu mnemonicParsing="false" text="Export Image">
-                        <items>
-                            <MenuItem mnemonicParsing="false" text="PNG (current view) " onAction="#menuSaveImage"/>
-                        </items>
-                    </Menu>
-
+                    <MenuItem fx:id="Load" onAction="#menuLoad" mnemonicParsing="false" text="Load" />
+                    <MenuItem fx:id="Export" onAction="#menuSaveImage" mnemonicParsing="false" text="Export" />
+                    <MenuItem fx:id="Histogramm" onAction="#menuHist" mnemonicParsing="false" text="Histogramm" />
+                    <MenuItem fx:id="Exit" onAction="#menuExit" mnemonicParsing="false" text="Exit" />
                 </items>
             </Menu>
-            <Menu mnemonicParsing="false" text="Select">
-                <items>
-                    <MenuItem mnemonicParsing="false" text="Select by range" />
-                    <MenuItem mnemonicParsing="false" text="Blast Sequence" />
-                    <MenuItem mnemonicParsing="false" text="Open Statistics View" />
-                    <MenuItem mnemonicParsing="false" text="Copy Sequence to Clipboard" />
-                </items>
-            </Menu>
-            <Menu mnemonicParsing="false" text="View">
-                <items>
-                    <MenuItem mnemonicParsing="false" text="Open Last Blast" />
-                    <MenuItem mnemonicParsing="false" text="Export Image" />
+            <!--<Menu fx:id="menuSaveImageID" mnemonicParsing="false" text="Export" onHiding="#menuSaveImage" onShowing="#menuSaveImage" />
+            <Menu fx:id="menuHistID" mnemonicParsing="false" text="Histogram" onHiding="#menuHist" onShowing="#menuHist" />
+            <Menu fx:id="menuExitID" mnemonicParsing="false" text="Exit" onHiding="#menuExit" onShowing="#menuExit" >-->
 
-                </items>
-            </Menu>
         </menus>
     </MenuBar>
       
-    <SplitPane dividerPositions="0.0, 1.0" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" fx:id="mainSplitPane">
+    <SplitPane fx:id="mainSplitPane" dividerPositions="0.18614357262103506" focusTraversable="true" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS">
         <items>
             <Accordion minWidth="169.0" prefHeight="553.0" prefWidth="169.0" SplitPane.resizableWithParent="false">
                 <panes>
@@ -73,33 +44,22 @@
                         <content>
                             <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                 <children>
-                                    <Slider id="layoutElementBondSize" fx:id="lEbondSize" layoutX="16.0" layoutY="74.0" majorTickUnit="5.0" max="10.0" minorTickCount="1" prefWidth="147.0" showTickLabels="false" showTickMarks="true" value="3.0" />
-                                    <Slider id="" fx:id="lEAtomSize" layoutX="-12.0" layoutY="31.0" majorTickUnit="5.0" max="10.0" minorTickCount="1" prefWidth="147.0" showTickMarks="true" snapToTicks="false" value="5.0" />
-                                    <VBox id="VBox" alignment="TOP_LEFT" layoutX="14.0" layoutY="106.0" spacing="10.0">
+                                    <VBox id="VBox" alignment="TOP_LEFT" layoutX="14.0" layoutY="5.0" spacing="10.0">
                                         <children>
-                                            <RadioButton fx:id="lEshowAtoms" mnemonicParsing="false" text="Atoms" />
-                                            <RadioButton fx:id="lEshowBonds" mnemonicParsing="false" text="Bonds" />
-                                            <RadioButton fx:id="lEshowSecondaryStructure" mnemonicParsing="false" text="Secondary Structure" />
-                                            <RadioButton fx:id="lEshowRibbons" mnemonicParsing="false" text="Ribbon View" />
+                                            <RadioButton fx:id="lEshowAtoms" mnemonicParsing="false" prefWidth="192.0" text="CrossborderBeforeRandom" />
+                                            <RadioButton fx:id="lEshowBonds" mnemonicParsing="false" text="Random" />
+                                            <RadioButton fx:id="lEshowSecondaryStructure" mnemonicParsing="false" text="AlignmentStart" />
+                                            <RadioButton fx:id="lEshowRibbons" mnemonicParsing="false" text="AlignmentLength" />
                                         </children>
                                     </VBox>
-                                    <Label layoutX="14.0" layoutY="14.0" text="Atom size" />
-                                    <Label id="lEBondSize" layoutX="14.0" layoutY="57.0" text="Bond size" />
-                                    <CheckBox layoutX="33.0" layoutY="261.0" mnemonicParsing="false" text="CheckBox" />
                                 </children>
                             </AnchorPane>
                         </content>
                     </TitledPane>
-                    <TitledPane animated="false" text="Colouring" fx:id="x6">
-                        <content>
-                            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-                        </content>
-                    </TitledPane>
                 </panes>
             </Accordion>
-            <MainView fx:id="mainPane" >
+            <MainView fx:id="mainPane">
             </MainView>
-            <AnchorPane maxWidth="200.0" minWidth="200.0" prefHeight="200.0" prefWidth="200.0" />
         </items>
     </SplitPane>
     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">

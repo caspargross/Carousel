@@ -1,48 +1,91 @@
 package main.controller;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.*;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.transform.Transform;
+import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
-import main.Main;
 import main.model.CircularParser;
-import main.model.Read;
-import main.view.CircularView;
-import main.view.GlobalInformation;
+import main.model.statistics.PositionSpecificReadCoverage;
 import main.view.MainView;
-import playground.Coordinate;
 import javafx.scene.image.WritableImage;
 import java.awt.image.BufferedImage;
 
-import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.stage.Stage;
 import javax.imageio.ImageIO;
 import java.io.IOException;
 
 
 import java.io.File;
-import java.util.List;
+
+import javafx.fxml.FXMLLoader;
+import main.view.PSRCBarChart;
 
 public class FxmlController {
+
+    // Controller elements
+    // Controller elements
+    private File fastaFile;
+    private File bamFile;
 
     // FXML Elements
 
     @FXML
     private MainView mainPane;
+
+    @FXML
+    void menuExit(ActionEvent e)
+    {
+
+        Stage stage = (Stage) mainPane.getScene().getWindow();
+        stage.close();
+
+        System.out.println("Exit called");
+    }
+
+    @FXML
+    void menuLoad(ActionEvent e)
+    {
+        Parent root;
+        try {
+
+            root = FXMLLoader.load(getClass().getClassLoader().getResource("resources/FileLoader.fxml"));
+            Stage stage = new Stage();
+            stage.setTitle("Load");
+            stage.setScene(new Scene(root, 450, 450));
+            stage.show();
+            // Hide this current window (if this is what you want)
+            //((Node)(event.getSource())).getScene().getWindow().hide();
+        }
+        catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @FXML
+    void menuHist(ActionEvent e) throws Exception {
+
+        int startIndex = 0;
+        int endIndex = 10;
+
+
+        Stage histStage = new Stage();
+        histStage.setTitle("Position specific read coverage");
+        PositionSpecificReadCoverage.computePSRC(bamFile);
+
+        Pane histPane = new Pane( );
+        histPane.getChildren( ).add( PSRCBarChart.createBarChartFromPSRC( startIndex, endIndex ) );
+        histStage.setScene( new Scene( histPane, 500, 500 ) );
+        histStage.show( );
+        return;
+    }
+
+
+
+
 
     @FXML
     void menuOpenFasta (ActionEvent e) {
@@ -67,7 +110,34 @@ public class FxmlController {
     }
 
 
+    @FXML
+    void menuOpenBam (ActionEvent e) {
 
+        FileChooser fc = new FileChooser();
+        fc.setTitle("OpenBamFile");
+
+
+        // Set extension filter
+        FileChooser.ExtensionFilter extFilter =
+                new FileChooser.ExtensionFilter("BAM files (*.bam)", "*.bam");
+        fc.getExtensionFilters().add(extFilter);
+
+        // Show open file dialog
+        File myBam = fc.showOpenDialog(null);
+        if(myBam != null) {
+            System.out.println("File Open Button pressed");
+            System.out.println(myBam.toString());
+            this.bamFile = myBam;
+        }
+
+
+        try {
+            startView();
+        } catch (Exception e1) {
+            e1.printStackTrace();
+        }
+
+    }
 
 
 
@@ -103,49 +173,16 @@ public class FxmlController {
     }
 
 
-    @FXML
-    void menuOpenBam (ActionEvent e) {
 
-        FileChooser fc = new FileChooser();
-        fc.setTitle("OpenBamFile");
-
-
-        // Set extension filter
-        FileChooser.ExtensionFilter extFilter =
-                new FileChooser.ExtensionFilter("BAM files (*.bam)", "*.bam");
-        fc.getExtensionFilters().add(extFilter);
-
-        // Show open file dialog
-        File myBam = fc.showOpenDialog(null);
-        if(myBam != null) {
-            System.out.println("File Open Button pressed");
-            System.out.println(myBam.toString());
-            this.bamFile = myBam;
-        }
-
-
-        try {
-            startView();
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
-    }
 
     @FXML
     private SplitPane mainSplitPane;
 
     @FXML
     void initialize() {
-
-
-
-
     }
 
-    // Controller elements
-    File fastaFile;
-    File bamFile;
+
 
 
 
