@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2018 Mauro Di Girolamo
  */
 
@@ -11,6 +11,15 @@ import javafx.collections.ObservableList;
 import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
+
+/*
+ * Design related note: Defining multiple nested class resulting into a rather big class is a drawback willingly taken
+ * to model the relation and natural high coupling of the classes. Using nested classes substructures a class
+ * maintaining the desired private visibilities while on top of that being able to be defined static to model the
+ * context appropriately. Despite the desire of having static attributes, the absence of a native singleton support of
+ * Java would have anyway made solutions necessary that I find ugly. Moreover, using nested classes many getter are
+ * unnecessary.
+ */
 
 /**
  * Note: This is the first version of the CircularParser. It does not yet account for sequencing errors (e.g. overlaps
@@ -104,7 +113,7 @@ public class CircularParser {
          * more information.
          */
         private static void createSorted( ) {
-            int referenceSequenceLength = ReferenceSequences.getCurrentReferenceSequenceLength( );
+            int referenceSequenceLength = ReferenceSequences.Current.getLength( );
             Collections.sort( Reads.Shown, Order.AlignmentStart );
             List< List< Read > > newSorted = new ArrayList<>( ); // Values will be added to this list first to avoid triggering the listener multiple times.
             /*
@@ -169,43 +178,48 @@ public class CircularParser {
          * that this amount of reads will be showed by the view with the CrossBorderBeforeRandom order being applied
          * before hiding.
          */
-        private static final int defaultReadAmountToDisplay = 500;
-
+        private static final int defaultAmountOfReadsToShow = 500;
 
         /**
-         * Orders CircularParser.Reads.Shown given a total order and then moves the first amountToHide elements from
-         * CircularParser.Reads.Shown to CircularParser.Reads.Hidden.
+         * Sets the amount of reads to be shown, that is to say to be contained in CircularParser.Reads.Sorted.
+         * <p>
+         * Will move Read objects from CircularParser.Reads.Shown to CircularParser.Reads.Hidden or vica versa depending
+         * on the parameters and the size of CircularParser.Reads.Shown.
+         * <p>
+         * The passed order relation is applied before transferring any Read objects from one list to the other.
          *
-         * @param amountToHide  the total amount of reads to hide
-         * @param orderRelation a total order to define which reads will rather be hidden; null means randomly
+         * @param amountToShow  the amount of Read objects to be shown
+         * @param orderRelation the order relation to be applied bfore transferring any Read objects
          */
-        public static void hide( int amountToHide, Comparator< Read > orderRelation ) throws Exception {
-            if( amountToHide <= 0 )
-                throw new Exception( "Invalid value for amountToHide: " + amountToHide + "." );
+        public static void setAmountOfReadsShown( int amountToShow, Comparator< Read > orderRelation ) {
+            if( Shown.size( ) == amountToShow )
+                return;
             else {
+                int amountToTransfer;
+                List< Read > source,
+                        target;
+                if( Shown.size( ) > amountToShow ) { // Hide reads.
+                    amountToTransfer = Shown.size( ) - amountToShow;
+                    source = Shown;
+                    target = Hidden;
+                } else { // Shown.size() < amountToShow holds, thus unhide reads.
+                    amountToTransfer = amountToShow - Shown.size( );
+                    source = Hidden;
+                    target = Shown;
+                    orderRelation = orderRelation.reversed( ); // Reverse order due to the logic of unhiding.
+                }
                 if( orderRelation == null )
                     orderRelation = Order.Random;
-                Collections.sort( Shown, orderRelation ); // Apply order relation.
-                for( ; amountToHide > 0; amountToHide-- ) {
-                    // Move the last Read in Shown (which is preferable when using an ArrayList) to Hidden:
-                    Read readToHide = Shown.get( Shown.size( ) - 1 );
-                    Shown.remove( Shown.size( ) - 1 );
-                    Hidden.add( readToHide );
+                Collections.sort( source, orderRelation ); // Apply order relation.
+                for( ; amountToTransfer > 0; amountToTransfer-- ) {
+                    // Always transfer last Read object from source to target (which is preferable when using an ArrayList):
+                    Read readToHide = source.get( source.size( ) - 1 );
+                    source.remove( source.size( ) - 1 );
+                    target.add( readToHide );
                 }
-                createSorted( );
+                createSorted( ); // Create the new new Sorted list.
                 return;
             }
-        }
-
-        /**
-         * Overloaded version of CircularParser.Reads.hide( ). Computes the absolute amount of reads and calls the
-         * actual implementation of the method.
-         *
-         * @param percentageToHide the percentage of reads to hide
-         * @param orderRelation    an order relation to define which reads will rather be hidden; null means randomly
-         */
-        public static void hide( float percentageToHide, Comparator< Read > orderRelation ) throws Exception {
-            hide( ( int ) ( percentageToHide * Shown.size( ) ), orderRelation );
         }
 
     }
@@ -224,7 +238,7 @@ public class CircularParser {
         /**
          * The index of the reference sequence from the referenceSequences list which is currently selected.
          */
-        private static int indexOfSelectedSequence;
+        private static int indexOfCurrentReferenceSequence;
 
 
         /**
@@ -241,28 +255,8 @@ public class CircularParser {
                 throw new Exception( "No reference sequence was found in file " + referenceSequence.toPath( ) + "!" );
             if( referenceSequenceIndexToSelect < 0 || referenceSequenceIndexToSelect > referenceSequences.size( ) - 1 )
                 throw new Exception( "The value of referenceSequenceIndexToSelect is not between 0 and referenceSequences.size() - 1." );
-            indexOfSelectedSequence = referenceSequenceIndexToSelect;
+            indexOfCurrentReferenceSequence = referenceSequenceIndexToSelect;
             return;
-        }
-
-
-        /**
-         * Returns referenceSequences.get( indexOfSelectedSequence ).
-         *
-         * @return referenceSequences.get(indexOfSelectedSequence)
-         */
-        public static FastaSequence getCurrentReferenceSequence( ) {
-            return referenceSequences.get( indexOfSelectedSequence );
-        }
-
-
-        /**
-         * Returns referenceSequences.get( indexOfSelectedSequence ).getSequence( ).length( ).
-         *
-         * @return referenceSequences.get(indexOfSelectedSequence).getSequence().length()
-         */
-        public static int getCurrentReferenceSequenceLength( ) {
-            return referenceSequences.get( indexOfSelectedSequence ).getSequence( ).length( );
         }
 
 
@@ -273,6 +267,35 @@ public class CircularParser {
          */
         public static List< String > getIdentifiers( ) {
             return referenceSequences.stream( ).map( FastaSequence::getIdentifier ).collect( Collectors.toList( ) );
+        }
+
+
+        /**
+         * This class contains attributes and methods regarding the current selected reference sequence.
+         */
+        public static class Current {
+
+            /**
+             * Returns CircularParser.ReferenceSequences.referenceSequences.get( indexOfCurrentReferenceSequence ).
+             *
+             * @return CircularParser.ReferenceSequences.referenceSequences.get(indexOfCurrentReferenceSequence)
+             */
+            public static FastaSequence getFastaSequence( ) {
+                return referenceSequences.get( indexOfCurrentReferenceSequence );
+            }
+
+
+            /**
+             * Returns CircularParser.ReferenceSequences.referenceSequences.get( indexOfCurrentReferenceSequence
+             * ).getSequence( ).length( ).
+             *
+             * @return CircularParser.ReferenceSequences.referenceSequences.get(indexOfCurrentReferenceSequence
+             *).getSequence().length()
+             */
+            public static int getLength( ) {
+                return referenceSequences.get( indexOfCurrentReferenceSequence ).getSequence( ).length( );
+            }
+
         }
 
     }
@@ -305,9 +328,9 @@ public class CircularParser {
          */
         ReferenceSequences.parseReferenceSequences( referenceSequencesFASTAFile, referenceSequenceToSelect );
         SamReader reader = SamReaderFactory.makeDefault( ).open( readsBAIFile != null ? SamInputResource.of( readsBAMFile ).index( readsBAIFile ) : SamInputResource.of( readsBAMFile ) ); // Open BAI file only if it is available.
-        if( ReferenceSequences.getCurrentReferenceSequenceLength( ) != reader.getFileHeader( ).getSequenceDictionary( ).getReferenceLength( ) )
+        int referenceSequenceLength = ReferenceSequences.Current.getLength( );
+        if( referenceSequenceLength != reader.getFileHeader( ).getSequenceDictionary( ).getReferenceLength( ) )
             throw new Exception( "The reference sequences FASTA file does not match the BAM file, because the length of the selected reference sequence differs." );
-        int referenceSequenceLength = ReferenceSequences.getCurrentReferenceSequenceLength( );
 
         /*
         Now, branch into the two cases of having a BAI file or not:
@@ -391,35 +414,37 @@ public class CircularParser {
              */
             HashMap< String, List< Read > > readMap = new HashMap<>( );
             for( SAMRecord newReadRecord : reader ) {
-                String readName = newReadRecord.getReadName( );
-                List< Read > oldReads;
-                if( ( oldReads = readMap.get( readName ) ) != null ) { // We see this read for at least the second time, check for Plasmid:
-                    Cigar newCigar = newReadRecord.getCigar( );
-                    boolean newReadSuccessfullyMerged = false,
-                            newReadAtStart = newReadRecord.getAlignmentStart( ) == 1, // 1-based coordinate system, so 1 is first position.
-                            newReadAtEnd = newReadRecord.getAlignmentEnd( ) == referenceSequenceLength;
-                    if( newCigar.isClipped( ) && ( newReadAtStart || newReadAtEnd ) ) // New Read overlaps at the start or the end of the reference sequence.
-                        for( Read oldRead : oldReads ) // Loop through all duplicates of this read which have already been found.
-                            if( !oldRead.isCrossBorder( ) ) { // oldRead is a candidate to combine.
-                                Cigar oldCigar = oldRead.getCigar( );
-                                boolean rightNewLeftOld = newCigar.isRightClipped( ) &&
-                                                          oldCigar.isLeftClipped( ) &&
-                                                          oldRead.getAlignmentStart( ) == 1, // 1-based coordinate system, so 1 is first position.
-                                        leftNewRightOld = newCigar.isLeftClipped( ) &&
-                                                          oldCigar.isRightClipped( ) &&
-                                                          oldRead.getAlignmentEnd( ) == referenceSequenceLength;
-                                if( rightNewLeftOld || leftNewRightOld ) { // We can combined oldRead and newReadRecord!
-                                    constructCrossBorderRead( oldRead, newReadRecord, rightNewLeftOld );
-                                    if( !newReadSuccessfullyMerged )
-                                        newReadSuccessfullyMerged = true;
-                                    break; // Can only merge one read once.
+                if( newReadRecord.getReferenceIndex( ) == referenceSequenceToSelect ) {
+                    String readName = newReadRecord.getReadName( );
+                    List< Read > oldReads;
+                    if( ( oldReads = readMap.get( readName ) ) != null ) { // We see this read for at least the second time, check for Plasmid:
+                        Cigar newCigar = newReadRecord.getCigar( );
+                        boolean newReadSuccessfullyMerged = false,
+                                newReadAtStart = newReadRecord.getAlignmentStart( ) == 1, // 1-based coordinate system, so 1 is first position.
+                                newReadAtEnd = newReadRecord.getAlignmentEnd( ) == referenceSequenceLength;
+                        if( newCigar.isClipped( ) && ( newReadAtStart || newReadAtEnd ) ) // New Read overlaps at the start or the end of the reference sequence.
+                            for( Read oldRead : oldReads ) // Loop through all duplicates of this read which have already been found.
+                                if( !oldRead.isCrossBorder( ) ) { // oldRead is a candidate to combine.
+                                    Cigar oldCigar = oldRead.getCigar( );
+                                    boolean rightNewLeftOld = newCigar.isRightClipped( ) &&
+                                                              oldCigar.isLeftClipped( ) &&
+                                                              oldRead.getAlignmentStart( ) == 1, // 1-based coordinate system, so 1 is first position.
+                                            leftNewRightOld = newCigar.isLeftClipped( ) &&
+                                                              oldCigar.isRightClipped( ) &&
+                                                              oldRead.getAlignmentEnd( ) == referenceSequenceLength;
+                                    if( rightNewLeftOld || leftNewRightOld ) { // We can combined oldRead and newReadRecord!
+                                        constructCrossBorderRead( oldRead, newReadRecord, rightNewLeftOld );
+                                        if( !newReadSuccessfullyMerged )
+                                            newReadSuccessfullyMerged = true;
+                                        break; // Can only merge one read once.
+                                    }
                                 }
-                            }
-                    if( !newReadSuccessfullyMerged ) // We were not able to merge the new read into a old read, so just add it to the proper List in the HashMap
-                        oldReads.add( Read.createNewReadFromSAMRecord( newReadRecord ) );
-                } else { // First time we see the read, just add it to the HashMap:
-                    readMap.put( readName, new ArrayList<>( ) );
-                    readMap.get( readName ).add( Read.createNewReadFromSAMRecord( newReadRecord ) );
+                        if( !newReadSuccessfullyMerged ) // We were not able to merge the new read into a old read, so just add it to the proper List in the HashMap
+                            oldReads.add( Read.createNewReadFromSAMRecord( newReadRecord ) );
+                    } else { // First time we see the read, just add it to the HashMap:
+                        readMap.put( readName, new ArrayList<>( ) );
+                        readMap.get( readName ).add( Read.createNewReadFromSAMRecord( newReadRecord ) );
+                    }
                 }
             }
 
@@ -435,7 +460,7 @@ public class CircularParser {
         /*
          * Hide an appropriate amount of reads (which also creates CircularParser.Reads.Sorted):
          */
-        Reads.hide( Reads.Shown.size( ) - Reads.defaultReadAmountToDisplay, Reads.Order.CrossBorderBeforeRandom );
+        Reads.setAmountOfReadsShown( Reads.defaultAmountOfReadsToShow, Reads.Order.CrossBorderBeforeRandom );
 
         return;
     }
@@ -500,7 +525,7 @@ public class CircularParser {
      * @return oldRead
      */
     private static Read constructCrossBorderRead( Read oldRead, SAMRecord newReadRecord, boolean oldReadIsLeft ) {
-        int referenceSequenceLength = ReferenceSequences.getCurrentReferenceSequenceLength( );
+        int referenceSequenceLength = ReferenceSequences.Current.getLength( );
         Cigar newCigar = newReadRecord.getCigar( ),
                 oldCigar = oldRead.getCigar( );
         if( oldReadIsLeft ) {

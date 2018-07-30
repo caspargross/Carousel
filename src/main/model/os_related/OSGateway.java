@@ -27,6 +27,9 @@ public class OSGateway {
         Unknown
     }
 
+    /**
+     * The detected OS type.
+     */
     private static OSType osType;
 
     /**

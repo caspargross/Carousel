@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2018 Mauro Di Girolamo
  */
 
@@ -19,13 +19,13 @@ public class FastaParserTest {
     /**
      * The FASTA file to test the parser with.
      */
-    private static File fastaFileToTest = new File( "./data/p7_ref.fasta" );
+    private final static File fastaFileToTest = new File( "./data/p7_ref.fasta" );
 
 
     /**
      * The code to be passed to the parser.
      */
-    private static FastaSequence.Code codeOfFile = FastaSequence.Code.NucleicAcid;
+    private final static FastaSequence.Code codeOfFile = FastaSequence.Code.NucleicAcid;
 
 
     /**
@@ -40,21 +40,20 @@ public class FastaParserTest {
      */
     public static void main( String[] args ) throws Exception {
         System.out.println( "=== Test without passing codeOfFile -> auto detect code ===" );
-        List< FastaSequence > fastaSequences = FastaParser.parse( fastaFileToTest );
-        for( int index = 0; index < fastaSequences.size( ); index++ ) {
-            FastaSequence fastaSequence = fastaSequences.get( index );
-            System.out.println( "Sequence #" + index + ": {" );
-            System.out.println( "\tIdentifier: " + fastaSequence.getIdentifier( ) );
-            System.out.println( "\tDescription: " + fastaSequence.getDescription( ) );
-            System.out.println( "\tCode: " + fastaSequence.getCode( ) );
-            System.out.println( "\tSequence: " + fastaSequence.getSequence( ) );
-            System.out.println( "}" );
-            System.out.println( );
-        }
+        printFastaSequences( FastaParser.parse( fastaFileToTest ) );
         System.out.println( "=== Test with passing codeOfFile ===" );
-        fastaSequences = FastaParser.parse( fastaFileToTest, codeOfFile );
-        for( int index = 0; index < fastaSequences.size( ); index++ ) {
-            FastaSequence fastaSequence = fastaSequences.get( index );
+        printFastaSequences( FastaParser.parse( fastaFileToTest, codeOfFile ) );
+        return;
+    }
+
+    /**
+     * Prints a list of FastaSequence objects to System.out.
+     *
+     * @param fastaSequencesList the list of FastaSequences to print
+     */
+    private static void printFastaSequences( List< FastaSequence > fastaSequencesList ) {
+        for( int index = 0; index < fastaSequencesList.size( ); index++ ) {
+            FastaSequence fastaSequence = fastaSequencesList.get( index );
             System.out.println( "Sequence #" + index + ": {" );
             System.out.println( "\tIdentifier: " + fastaSequence.getIdentifier( ) );
             System.out.println( "\tDescription: " + fastaSequence.getDescription( ) );
@@ -63,8 +62,6 @@ public class FastaParserTest {
             System.out.println( "}" );
             System.out.println( );
         }
-
-
         return;
     }
 

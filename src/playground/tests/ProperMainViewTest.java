@@ -1,11 +1,11 @@
-
+package playground.tests;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.SceneAntialiasing;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
 import main.model.CircularParser;
-import main.view.MainView;
+import main.view.MiddlePane;
 
 import java.io.File;
 
@@ -13,9 +13,10 @@ public class ProperMainViewTest extends Application{
     boolean parsed = false;
     @Override
     public void start( Stage primaryStage ) throws Exception {
-        MainView mainView = new MainView();
+        MiddlePane mainView = new MiddlePane();
         primaryStage.setTitle("Proper Test of the MainView Class");
-        primaryStage.setScene( new Scene( mainView,mainView.getWidth(),mainView.getHeight(),true,SceneAntialiasing.DISABLED));
+        Scene cacheTest = new Scene( mainView,mainView.getWidth(),mainView.getHeight());
+        primaryStage.setScene(cacheTest);
         primaryStage.show( );
         mainView.setOnMousePressed((me) ->{
             try{
@@ -24,6 +25,24 @@ public class ProperMainViewTest extends Application{
                 System.out.println(ex.getMessage());
             }
         });
+        cacheTest.setOnKeyPressed(ke->{
+
+            KeyCode keyCode = ke.getCode();
+            System.out.println("key was pressed: "+ keyCode);
+            if(keyCode.equals(KeyCode.S)){
+                System.out.println("setting cache to speed");
+                mainView.CacheTempSpeed();
+            }
+            if(keyCode.equals(KeyCode.Q)){
+                System.out.println("setting cache to quality");
+                mainView.CacheTempQuality();
+            }
+            if(keyCode.equals(KeyCode.E)){
+                mainView.EnableCache();
+            }
+        });
+
+
     }
     //Change here if you want to parse with reference + bai + bam or a different file genereally
     public void parseBam()throws  Exception{

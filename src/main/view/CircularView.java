@@ -1,7 +1,9 @@
 package main.view;
 
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.scene.CacheHint;
+import main.model.CircularParser;
 import main.model.Read;
 
 import java.util.ArrayList;
@@ -58,21 +60,30 @@ public class CircularView {
      */
 
     public CircularView(ObservableList< List< Read > >  listOfReadLists, GlobalInformation info){
-        printGivenReadList(listOfReadLists);
+        //printGivenReadList(CircularParser.Reads.getReadsSorted());
+        String before,
+                after;
+        before = CircularParser.Reads.getReadsSorted().toString();
         this.info = new GlobalInformation(info.getCenter(),info.getRadius(),info.height.getValue(),info.getGlobalLength());
         readViews = new ReadView[calcReadCount(listOfReadLists)];
+       System.out.println(before);
         levelArrayAsInteger = createLevelArray(listOfReadLists,0);
+        after = CircularParser.Reads.getReadsSorted().toString();
+        System.out.println(after);
+        if(!before.equals(after)) System.out.println("CHANGE OF DATA");
         for(int i = 0; i < readArrayOfSecondLevelCreation.length;i++){
             readViews[i] = new ReadView(readArrayOfSecondLevelCreation[i],this.info,levelArrayAsInteger[i]);
             }
         this.info.height.addListener((observable, oldValue, newValue) -> {
             for(int i =0; i < readViews.length;i++){
                 readViews[i].updateHeight((double)newValue);
-                readViews[i].updateStrokeWidth((double)newValue);
+                //readViews[i].updateStrokeWidth((double)newValue);
 
             }
         });
-        printLevelArrayforDebugging();
+
+
+        //printLevelArrayforDebugging();
         //checkIfLevelArrayisCorrect();
     }
     private int calcReadCount(ObservableList< List< Read > >  listOfReadLists){
@@ -143,7 +154,9 @@ public class CircularView {
     return tempArray;
     }
 
-    public Integer[] createLevelArray(ObservableList< List< Read > >  listOfReadLists, int startIndex){
+    public Integer[] createLevelArray( ObservableList< List< Read > > listOfReadLists, int startIndex){
+
+
         /**
          * To keep track if we even placed any Read in the current Level, this enables us that if we went through all the possible Indexes of the given Array and have´t placed a Read in, we can deduce that we no longer have ANY remaining reads.
          * Also it enables us to divide the cases:
@@ -168,12 +181,6 @@ public class CircularView {
          * left Bound of our filled Segment of the levelRing (typically read.getAlignmentEnd of the firstly placed read. (if the first read is circular start&End are swapped)
          */
         int leftBound=0;
-        /**
-         * right Bound of our filled Segment of the levelRing (typically read.getAlignmentStart of the firstly placed read. (if the first read is circular start&End are swapped)
-         * Since we add on the right side, this continously increases till we no longer find any fitting Reads between rightBound and leftBound
-         */
-        int rightBound=0;
-
         /**
          * is simply the amount of Indexes thelistOfReadLists has, thus the total referenceLength, not exactly necessarily but used to keep the expressions shorter.
          */
@@ -219,7 +226,6 @@ public class CircularView {
         int firstplaced = 0;
         int placed = 0;
         deleteWeirdReads(listOfReadLists);
-        System.out.println(listOfReadLists.toString());
         while(!allDistributed){
            while(index <gLength){ // - we traverse the given Array from start to End(i). Since we want to start at the startIndex our acessing indexes are thus calculated like this array[i+startIndex%gLength)
                if (!firstReadInLevelSet){ // - if we haven´t already placed a firstRead in the current level, we have to do that: (so we know our right&left bounds)
@@ -257,8 +263,8 @@ public class CircularView {
 
                    }
                    else if(index == gLength-1&&listOfReadLists.get((index+startIndex)%gLength).isEmpty()){ // - if we aren´t able to place a read in the current level, and haven´t already placed one  we can only conclude that there is nothing left.
-                       System.out.println("we are done, all Distributed is set");
-                       System.out.println(firstplaced);
+                       //System.out.println("we are done, all Distributed is set");
+                       //System.out.println(firstplaced);
                        allDistributed=true;
                        readArrayOfSecondLevelCreation= readArrayList.toArray(new Read[readArrayList.size()]);
                        break;
@@ -335,8 +341,8 @@ public class CircularView {
             }
 
         }
-        System.out.println(levelArrayList.toString());
-        System.out.println(readcount);
+        //System.out.println(levelArrayList.toString());
+        //System.out.println(readcount);
         timeAfter = System.currentTimeMillis();
         System.out.println("The creation of the level-array took " + (timeAfter-timeBefore) + "milliseconds");
         return levelArrayList.toArray(new Integer[levelArrayList.size()]);
@@ -353,9 +359,11 @@ public class CircularView {
         }
     }
     public void cacheToQuality(){
+        System.out.println("setting to quality in progress");
         for(ReadView rW: readViews){
             rW.getArchSegment().getInner().setCacheHint(CacheHint.QUALITY);
         }
+        System.out.println("done");
     }
     public void cacheToSpeed(){
         for(ReadView rW:readViews){
@@ -389,7 +397,7 @@ public class CircularView {
         for (String s:printText) {
             System.out.println(s);
         }
-        System.out.println(printText.length);
+
 
 
     }

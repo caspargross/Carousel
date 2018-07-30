@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright (C) 2018 Mauro Di Girolamo
  */
 
@@ -131,6 +131,8 @@ public class FastaSequence {
      * If code is passed as null, all possible codes will be tried out sequentially and the first matching code will be
      * set as this FastaSequence object's code.
      *
+     * All characters of a sequence will be converted to their respective upper case versions.
+     *
      * @param identifier  the identifier of the FASTA sequence
      * @param description the description of the FASTA sequence
      * @param sequence    the actual sequence of the FASTA sequence
@@ -140,6 +142,7 @@ public class FastaSequence {
      * @throws Exception
      */
     public FastaSequence( String identifier, String description, String sequence, Code code ) throws Exception {
+        sequence = sequence.toUpperCase( );
         if( code != null ) { // Match for the given code:
             final String validCharacters = code.getValidCharacters( );
             for( char character : sequence.toCharArray( ) ) { // Loop over all characters to be able to name an invalid character if necessary:

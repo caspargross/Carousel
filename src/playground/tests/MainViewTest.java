@@ -56,7 +56,7 @@ public class MainViewTest extends Application {
                    referenceSequenceFile = new File("./data/sampleC_02.fasta");
 
         CircularParser.parse(referenceSequenceFile, BAMFileToTest, BAIFileToTest);
-        int referenceLength = CircularParser.ReferenceSequences.getCurrentReferenceSequenceLength();
+        int referenceLength = CircularParser.ReferenceSequences.Current.getLength();
         ObservableList< List< Read > > temp = CircularParser.Reads.getReadsSorted();
         int longAmount = 0;
         for(int i = 0; i < temp.size();i++){
