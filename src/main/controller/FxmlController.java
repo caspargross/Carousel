@@ -10,12 +10,16 @@ import main.model.CircularParser;
 import main.model.statistics.PositionSpecificReadCoverage;
 import main.view.MainView;
 import javafx.scene.image.WritableImage;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.scene.layout.VBox;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import java.io.IOException;
 
 
@@ -29,13 +33,25 @@ public class FxmlController {
 
     // Controller elements
     // Controller elements
-    private File fastaFile;
-    private File bamFile;
+    private File fastaFile=null;
+    private File bamFile=null;
 
     // FXML Elements
 
+    private Stage fileChooserWindow = null;
+
+    @FXML
+    private VBox fileLoaderVBox;
+
     @FXML
     private MainView mainPane;
+
+    @FXML
+    private javafx.scene.control.TextField fastaPath;
+
+
+    @FXML
+    private javafx.scene.control.TextField bamPath;
 
     @FXML
     void menuExit(ActionEvent e)
@@ -48,18 +64,31 @@ public class FxmlController {
     }
 
     @FXML
+    void fileMenuConfirm(ActionEvent e){
+        if(fastaFile != null && bamFile != null)
+        {
+           Stage stage = (Stage) fileLoaderVBox.getScene().getWindow();
+           stage.close();
+        }
+    }
+
+    @FXML
+    void fileMenuCancel(ActionEvent e) {
+        Stage stage = (Stage) fileLoaderVBox.getScene().getWindow();
+        stage.close();
+    }
+
+    @FXML
     void menuLoad(ActionEvent e)
     {
         Parent root;
         try {
 
             root = FXMLLoader.load(getClass().getClassLoader().getResource("resources/FileLoader.fxml"));
-            Stage stage = new Stage();
-            stage.setTitle("Load");
-            stage.setScene(new Scene(root, 450, 450));
-            stage.show();
-            // Hide this current window (if this is what you want)
-            //((Node)(event.getSource())).getScene().getWindow().hide();
+            fileChooserWindow = new Stage();
+            fileChooserWindow.setTitle("Load");
+            fileChooserWindow.setScene(new Scene(root, 450, 450));
+            fileChooserWindow.show();
         }
         catch (IOException ex) {
             ex.printStackTrace();
@@ -104,7 +133,9 @@ public class FxmlController {
         File myFasta = fc.showOpenDialog(null);
         if(myFasta != null) {
             System.out.println("File Open Button pressed");
+
             System.out.println(myFasta.toString());
+            fastaPath.setText(myFasta.toString());
             //code to load the bam file and do sth meaningful with it
             this.fastaFile = myFasta;
         }
@@ -129,6 +160,7 @@ public class FxmlController {
             System.out.println("File Open Button pressed");
             System.out.println(myBam.toString());
             this.bamFile = myBam;
+            bamPath.setText(myBam.toString());
         }
 
 
@@ -181,6 +213,7 @@ public class FxmlController {
 
     @FXML
     void initialize() {
+
     }
 
 

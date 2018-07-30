@@ -4,11 +4,12 @@
 <?import javafx.scene.control.Accordion?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TitledPane?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -23,10 +24,10 @@
         <menus>
             <Menu fx:id="menu" mnemonicParsing="false" text="Menu">
                 <items>
-                    <MenuItem fx:id="Load" onAction="#menuLoad" mnemonicParsing="false" text="Load" />
-                    <MenuItem fx:id="Export" onAction="#menuSaveImage" mnemonicParsing="false" text="Export" />
-                    <MenuItem fx:id="Histogramm" onAction="#menuHist" mnemonicParsing="false" text="Histogramm" />
-                    <MenuItem fx:id="Exit" onAction="#menuExit" mnemonicParsing="false" text="Exit" />
+                    <MenuItem fx:id="Load" mnemonicParsing="false" onAction="#menuLoad" text="Load" />
+                    <MenuItem fx:id="Export" mnemonicParsing="false" onAction="#menuSaveImage" text="Export" />
+                    <MenuItem fx:id="Histogramm" mnemonicParsing="false" onAction="#menuHist" text="Histogramm" />
+                    <MenuItem fx:id="Exit" mnemonicParsing="false" onAction="#menuExit" text="Exit" />
                 </items>
             </Menu>
             <!--<Menu fx:id="menuSaveImageID" mnemonicParsing="false" text="Export" onHiding="#menuSaveImage" onShowing="#menuSaveImage" />
@@ -46,10 +47,13 @@
                                 <children>
                                     <VBox id="VBox" alignment="TOP_LEFT" layoutX="14.0" layoutY="5.0" spacing="10.0">
                                         <children>
-                                            <RadioButton fx:id="lEshowAtoms" mnemonicParsing="false" prefWidth="192.0" text="CrossborderBeforeRandom" />
-                                            <RadioButton fx:id="lEshowBonds" mnemonicParsing="false" text="Random" />
-                                            <RadioButton fx:id="lEshowSecondaryStructure" mnemonicParsing="false" text="AlignmentStart" />
-                                            <RadioButton fx:id="lEshowRibbons" mnemonicParsing="false" text="AlignmentLength" />
+                                            <RadioButton fx:id="lEshowAtoms" mnemonicParsing="false" prefWidth="192.0" selected="true" text="CrossborderBeforeRandom">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="tgRadioButtons" />
+                                       </toggleGroup></RadioButton>
+                                            <RadioButton fx:id="lEshowBonds" mnemonicParsing="false" text="Random" toggleGroup="$tgRadioButtons" />
+                                            <RadioButton fx:id="lEshowSecondaryStructure" mnemonicParsing="false" text="AlignmentStart" toggleGroup="$tgRadioButtons" />
+                                            <RadioButton fx:id="lEshowRibbons" mnemonicParsing="false" text="AlignmentLength" toggleGroup="$tgRadioButtons" />
                                         </children>
                                     </VBox>
                                 </children>

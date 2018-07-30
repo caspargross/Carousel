@@ -5,19 +5,19 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox prefHeight="100.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controller.FxmlController">
+<VBox fx:id="fileLoaderVBox" prefHeight="100.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controller.FxmlController">
    <children>
        <AnchorPane>
-           <TextField layoutX="82.0" prefHeight="27.0" prefWidth="300.0" />
-           <Button text="Fasta File" />
+           <TextField fx:id="fastaPath" layoutX="82.0" prefHeight="27.0" prefWidth="300.0" />
+           <Button text="Fasta File" onAction="#menuOpenFasta"/>
        </AnchorPane>
        <AnchorPane>
-           <TextField layoutX="81.0" prefHeight="27.0" prefWidth="300.0" />
-           <Button text="BAM File " />
+           <TextField fx:id="bamPath" layoutX="81.0" prefHeight="27.0" prefWidth="300.0" />
+           <Button text="BAM File " onAction="#menuOpenBam"/>
        </AnchorPane>
        <AnchorPane>
-           <Button text="OK" />
-           <Button layoutX="81.0"  text="Cancel" />
+           <Button text="OK" onAction="#fileMenuConfirm" />
+           <Button layoutX="81.0"  text="Cancel" onAction="#fileMenuCancel" />
        </AnchorPane>
    </children>
 </VBox>
