@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.File;
 
 import javafx.fxml.FXMLLoader;
+import main.view.MiddlePane;
 import main.view.PSRCBarChart;
 
 public class FxmlController {
@@ -190,7 +191,12 @@ public class FxmlController {
 
     private void startView() throws Exception {
 
-        //this.mainPane.setStyle("-fx-background-color: #ffffff");
+
+        this.mainPane.setStyle("-fx-background-color: #ffffff");
+        this.mainPane.getChildren().clear();
+        this.mainPane.getChildren().add(new MiddlePane());
+
+
 
         String baiFileName = bamFile.getAbsolutePath();
         baiFileName = baiFileName.replace(".bam", ".bai");
