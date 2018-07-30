@@ -78,21 +78,21 @@ public class CircularParser {
          * <p>
          * More formally: Let
          * <p>
-         * - List( i ) := Shown.get( i ) be the i-th List in CircularParser.Reads.Shown
+         * - <pre>{@code List( i ) := Shown.get( i )}</pre> be the i-th List in CircularParser.Reads.Shown
          * <p>
-         * - Read( i, j ) := List( i ).get( j ) be the j-th Read object in the i-th List and
+         * - <pre>{@code Read( i, j ) := List( i ).get( j )}</pre> be the j-th Read object in the i-th List and
          * <p>
-         * - Indices( List ) be the set of all possible indices of a List.
+         * - <pre>{@code Indices( List )}</pre> be the set of all possible indices of a List.
          * <p>
          * Then, the sorted structure can be defined as follows:
          * <p>
-         * [ Read( i, j ).getAlignmentStart( ) = i + 1 ] for all i in Indices( CircularParser.Reads.Shown ) and j in
-         * Indices( List( i ) )
+         * <pre>{@code [ Read( i, j ).getAlignmentStart( ) = i + 1 ] for all i in Indices( CircularParser.Reads.Shown ) and j in
+         * Indices( List( i ) )}</pre>
          * <p>
          * and
          * </p>
-         * [ ( j < k ) => ( Read( i, j ).getAlignmentLength( ) >= Read( i, k ).getAlignmentLength( ) ) ] for all i in
-         * Indices( CircularParser.Reads.Shown ) and j, k in Indices( List( i ) )
+         * <pre>{@code [ ( j < k ) => ( Read( i, j ).getAlignmentLength( ) >= Read( i, k ).getAlignmentLength( ) ) ] for all i in
+         * Indices( CircularParser.Reads.Shown ) and j, k in Indices( List( i ) )}</pre>
          * <p>
          * holds.
          */
@@ -159,14 +159,16 @@ public class CircularParser {
 
 
             /**
-             * Order Read objects such that readA < readB holds, if either
+             * Order Read objects such that <pre>{@code readA < readB}</pre> holds, if either
              * <p>
-             * readA is cross-border and readB is not
+             * <pre>{@code readA is cross-border and readB is not}</pre>
              * <p>
              * or
              * <p>
-             * readA and readB are either both cross-border or both not cross-border and readA.getRandomID( ) <
-             * readB.getRandomID( ) holds.
+             * <pre>{@code readA and readB are either both cross-border or both not cross-border and readA.getRandomID( ) <
+             * readB.getRandomID( )}</pre>
+             * <p>
+             * holds.
              */
             public final static Comparator< Read > CrossBorderBeforeRandom = ( Read readOne, Read readTwo ) -> readOne.isCrossBorder( ) ^ readTwo.isCrossBorder( ) ? ( readOne.isCrossBorder( ) ? -1 : 1 ) : ( readOne.getRandomID( ) < readTwo.getRandomID( ) ? -1 : 1 ); // No need to return 0 at any point, because by definition there will never be equal objects in this order.
 
