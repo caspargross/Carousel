@@ -1,8 +1,6 @@
 package playground.tests;
 
-import javafx.collections.ListChangeListener;
 import javafx.collections.ObservableList;
-import javafx.event.Event;
 import javafx.scene.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.transform.Transform;
@@ -15,30 +13,13 @@ import java.io.File;
 import javafx.application.Application;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.event.EventHandler;
 import javafx.scene.Scene;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.Pane;
-import javafx.scene.shape.Line;
-import javafx.scene.text.Text;
-import javafx.scene.transform.Rotate;
-import javafx.scene.transform.Scale;
-import javafx.stage.Stage;
-import main.model.CircularParser;
 import main.model.Read;
 import main.view.CircularView;
 import main.view.GlobalInformation;
-import main.view.ReadView;
-import playground.Coordinate;
+import main.view.Coordinate;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
-import playground.ViewHelper;
-import javax.swing.text.View;
 
 public class MainViewTest extends Application {
     private double downX, downY;

@@ -4,7 +4,7 @@ import main.model.Read;
 
 /**
  * Class consisting of a Read and through initializing an archSegment.
- * contains Getter for the ArchSegment&Read  +  functions to updateHeight&StrokeWidth of the archsegment,
+ * contains Getter for the ArchSegment+Read  +functions to updateHeight+StrokeWidth of the archsegment
  * @author Felix
  */
 public class ReadView {
@@ -23,8 +23,6 @@ public class ReadView {
         this.read = read;
         this.archSegment = new ArchSegment(read,info,level);
     }
-
-    //GETTER
 
     /**
      * returns the Read of the ReadView object
@@ -57,4 +55,6 @@ public class ReadView {
     public void updateStrokeWidth(double newValue){
         this.archSegment.setStrokeWidth(newValue);
     }
+
+
 }

@@ -41,9 +41,8 @@ public class ProperMainViewTest extends Application{
                 mainView.EnableCache();
             }
         });
-
-
     }
+
     //Change here if you want to parse with reference + bai + bam or a different file genereally
     public void parseBam()throws  Exception{
         final File referenceSequencesFileToTest = new File( "./data/p7_ref.fasta" ),

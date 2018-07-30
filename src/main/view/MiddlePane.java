@@ -1,7 +1,14 @@
 package main.view;
 
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import main.Main;
 
+/**
+ * Class that wraps the MainView, since rescaling behaved highly weirdly when this was not done (high fluctations of the height /width properties)
+ * basically the same as the mainview
+ * @author Felix
+ */
 public class MiddlePane extends AnchorPane {
     private MainView mainView;
     private LabelView labelView;
@@ -31,5 +38,8 @@ public class MiddlePane extends AnchorPane {
         mainView.CacheTempQuality();
     }
     public void EnableCache(){ mainView.EnableCache();
+    }
+    public void changeColor(Color colorGapCloser, Color colorReversed, Color colorNormal){
+        mainView.changeColor(colorGapCloser,colorReversed,colorNormal);
     }
 }

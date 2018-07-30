@@ -1,4 +1,9 @@
-package playground;
+package main.view;
+
+/**
+ * class that represents a cartesian coordinate, in retrospect could propably be simply done with a Point2D - eventually changed later
+ * @author Felix
+ */
 
 public class Coordinate {
 

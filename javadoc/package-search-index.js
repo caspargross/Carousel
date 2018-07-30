@@ -1,1 +1,1 @@
-packageSearchIndex = [{"l":"main.model"},{"l":"main.model.os_related"},{"l":"main.model.os_related.os_communicator"},{"l":"main.model.os_related.os_communicator.interfaces"},{"l":"playground"}]
+packageSearchIndex = [{"l":"main"},{"l":"main.controller"},{"l":"main.model"},{"l":"main.model.os_related"},{"l":"main.model.os_related.os_communicator"},{"l":"main.model.os_related.os_communicator.interfaces"},{"l":"main.model.statistics"},{"l":"main.view"},{"l":"playground"},{"l":"playground.tests"}]

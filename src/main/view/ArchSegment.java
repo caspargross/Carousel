@@ -3,7 +3,6 @@ package main.view;
 import javafx.scene.CacheHint;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Arc;
-import javafx.scene.shape.Line;
 import main.model.Read;
 
 /**
@@ -21,20 +20,20 @@ public class ArchSegment {
     /**
      * Information that is stored after the ArchSegment has been initialised, this is needed to update the height later on.
      */
-    private Color archColor = Color.BLACK;
+    private Color archColor = Color.rgb(77,175,74);
     private boolean isGapcloser,isReversed;
     private int alignmentStart, alignmentEnd,readLength,level;
     private GlobalInformation info;
 
     /**
-     * helper function to determine our standard color of the Read. (Gapclosers => RED, Reversed Reads => BLUE, else => BLACK(
+     * helper function to determine our standard color of the Read.
      */
     private void determinteStandardColor(){
         if(isGapcloser){
-            archColor = Color.RED;
+            archColor = Color.rgb(228,26,28);
         }
         if(isReversed){
-            archColor = Color.BLUE;
+            archColor = Color.rgb(55,126,184);
         }
     }
 
@@ -69,8 +68,8 @@ public class ArchSegment {
         inner.setCenterY(info.getCenter().getY());
         inner.setRadiusX(effradius);
         inner.setRadiusY(effradius);
-        inner.setStartAngle(((info.getGlobalLength()-alignmentStart)/info.getGlobalLength())*360);
-        inner.setLength((readLength/info.getGlobalLength())*-360);
+        inner.setStartAngle(((info.getReferenceLength()-(double)alignmentStart)/info.getReferenceLength())*360);
+        inner.setLength(((double)readLength/(double)info.getReferenceLength())*-360);
         inner.setStroke(archColor);
         inner.setFill(Color.TRANSPARENT);
         inner.setStrokeWidth(height);
@@ -82,7 +81,6 @@ public class ArchSegment {
     /**
      * Constructor of the Archsegment, receiving (read+global) information, aswell as a Level where the Element in going to get placed
      * Functionality is to set the fields of the Archsegment with values, then update the Height (and thus the 2 Lines + 2 Arcs)
-     * setStrokeWidth is set as 3 as a standard TODO: find a good value (propably needs to be changed dynamically aswell).
      * @param read given Read that is going to be visually represented by this ArchSegment
      * @param info given gInfo that represents the information available from the reference + general drawing Information
      * @param level given Level at which the Segment is placed in the Ring.
@@ -91,7 +89,7 @@ public class ArchSegment {
         this.info = info;
         this.isGapcloser=read.isCrossBorder();
         this.isReversed=read.getNegativeStrandFlag();
-        this.alignmentStart =read.getAlignmentStart(); //TODO: Check if thos need both to be decremented by 1 or not
+        this.alignmentStart =read.getAlignmentStart();
         this.alignmentEnd = read.getAlignmentEnd();
         this.level = level;
         this.readLength = read.getAlignmentLength();

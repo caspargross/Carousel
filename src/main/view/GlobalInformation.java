@@ -2,36 +2,44 @@ package main.view;
 
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import playground.Coordinate;
+import main.model.CircularParser;
 
 /**
  * class containg general information that is needed to visual Elements, create objects.
  * WIP: rework the concept of the globalInformation (given a referenceLength = globalLength) in the constructor we set the radius,center, etc
+ * @author Felix
  */
 public class GlobalInformation {
     private Coordinate center;
     private double radius;
     public DoubleProperty height= new SimpleDoubleProperty();
-    private double globalLength;
+    private int referenceLength;
     private double rotation = 0.0; //TODO: Currently rotation for the Scroll-calculation is in Globalinformation. This is only used for the main so it should go back to as a global variable?
 
 
 
     //TODO: Constructor right now needs a lot of inputs, that can be easily calculated from a given referenceLength(global Length). Can´t be changed right now because Standard Zoom is still WIP
     //CONSTRUCTOR
-    public GlobalInformation(Coordinate center, double radius, double height, double globalLength){
+    public GlobalInformation(Coordinate center, double radius, double height, int referenceLength){
         this.center = new Coordinate(center.getX(),center.getY());
         this.radius=radius;
         this.height.setValue(height);
-        this.globalLength = globalLength;
+        this.referenceLength = referenceLength;
     }
 
     /**
-     * Different approach of a constructor - given a referenceLength it is dynamically decided what are good choices for  a radius, thus the center coordinates, the height of the segments (and strokewidth),
-     * @param referenceLength given referenceLength of a parsed File
+     * Different Approach:
+     * since currently a gInfo is only created after we´ve parsed an object we can move the hard-coded elements (radius,height,center) here, and grab the referenceLength from the Parser
+     * whenever a second File is parsed we simply have to update the refernceLength, the rest is as usual (implemented but not used - whenever a 2nd parse happens we create new gInfo+CircularVIew
      */
-    public GlobalInformation(double referenceLength){
-
+    public GlobalInformation(){
+        this.center =new Coordinate(800,500); //TODO: change dynamically depending on parent. (When fxml has proper values)
+        this.radius = 100;
+        this.height = new SimpleDoubleProperty(2.5);
+        this.referenceLength = CircularParser.ReferenceSequences.Current.getLength();
+    }
+    public void updateReferenceLength(){
+        this.referenceLength = CircularParser.ReferenceSequences.Current.getLength();
     }
 
     //GETTER
@@ -39,8 +47,8 @@ public class GlobalInformation {
         return center;
     }
 
-    public double getGlobalLength() {
-        return globalLength;
+    public int getReferenceLength() {
+        return referenceLength;
     }
 
     public double getHeight() {
@@ -62,8 +70,8 @@ public class GlobalInformation {
         this.center = center;
     }
 
-    public void setGlobalLength(double globalLength) {
-        this.globalLength = globalLength;
+    public void setReferenceLength(int referenceLength) {
+        this.referenceLength = referenceLength;
     }
 
     public void setHeight(double height) {

@@ -1,8 +1,7 @@
 package main.view;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.scene.CacheHint;
+import javafx.scene.paint.Color;
 import main.model.CircularParser;
 import main.model.Read;
 
@@ -12,13 +11,14 @@ import java.util.Objects;
 
 /**
  * Class containing readViews, and function to create a levelArray. needs a Array of Reads + globalInformation to be constructed
+ * Has 2 different constructors (and level-methods), which is based on the developemnt of our model-datastructure and our approach how to stack a level.
  * @author Felix
  */
 public class CircularView {
     /**
      * the levelArray contains information on which level each Read is to be drawn
      */
-    public Integer[] levelArrayAsInteger; // for the second LevelMethod
+    private Integer[] levelArrayAsInteger; // for the second LevelMethod
     /**
      * the GlobalInformation contains information that is needed for the ArchSegments (center,radius,circumference)
      */
@@ -30,12 +30,12 @@ public class CircularView {
     private int[] levelArray;
     private Read[] readArrayOfSecondLevelCreation; // for the second LevelMethod
     /**
-     * Creates a new CircularView, additionally creates a levelArray so the readViews can be properly drawn
-     * @param readArray Array of Reads, selfexplanatory
-     * @param info globalInformation, containing radius,center Coordinate, circumference etc
+     * First used when the received data-structure was an Array and our approach of stacking highly primitive, remains here but can later be restructured / removed
+     * @param readArray Array of the reads, of which a CircularView is to be created
+     * @param info GlobalInformation with the needed information
      */
     public CircularView (Read[] readArray, GlobalInformation info){
-        this.info = new GlobalInformation(info.getCenter(),info.getRadius(),info.height.getValue(),info.getGlobalLength());
+        this.info = new GlobalInformation(info.getCenter(),info.getRadius(),info.height.getValue(),info.getReferenceLength());
         // Fill the Array of readViews
         readViews = new ReadView[readArray.length];
         levelArray = createLevelArray(readArray);
@@ -43,9 +43,9 @@ public class CircularView {
             readViews[i] = new ReadView(readArray[i],this.info, levelArray[i]);
         }
         this.info.height.addListener((observable, oldValue, newValue) -> {
-            for(int i =0; i < readViews.length;i++){
-                readViews[i].updateHeight((double)newValue);
-                readViews[i].updateStrokeWidth((double)newValue);
+            for (ReadView readView : readViews) {
+                readView.updateHeight((double) newValue);
+                readView.updateStrokeWidth((double) newValue);
 
             }
         });
@@ -54,47 +54,24 @@ public class CircularView {
 
     /**
      * Creates a CircularView, creates a levelArray with a different method since this method is given a different datatype.
-     * No testing available, will propably throw tons of errors..
-     * @param listOfReadLists
-     * @param info
+     * Adds a Listener on the Height-property of the GlobalInformation - if that happens to change (e.g when zooming) we adjust each arch´s strokewidth and their placement
+     * @param listOfReadLists data from our model about the Reads, for information regarding the structure visit the CircularParser class
+     * @param info globalInformation with center/radius/base height/referenceLength
      */
+    public CircularView(List< List< Read > >  listOfReadLists, GlobalInformation info){
 
-    public CircularView(ObservableList< List< Read > >  listOfReadLists, GlobalInformation info){
-        //printGivenReadList(CircularParser.Reads.getReadsSorted());
-        String before,
-                after;
-        before = CircularParser.Reads.getReadsSorted().toString();
-        this.info = new GlobalInformation(info.getCenter(),info.getRadius(),info.height.getValue(),info.getGlobalLength());
-        readViews = new ReadView[calcReadCount(listOfReadLists)];
-       System.out.println(before);
-        levelArrayAsInteger = createLevelArray(listOfReadLists,0);
-        after = CircularParser.Reads.getReadsSorted().toString();
-        System.out.println(after);
-        if(!before.equals(after)) System.out.println("CHANGE OF DATA");
+        this.info = new GlobalInformation(info.getCenter(),info.getRadius(),info.height.getValue(),info.getReferenceLength());
+        readViews = new ReadView[CircularParser.Reads.getReadAmount()];
+        levelArrayAsInteger = createLevelArray(listOfReadLists, info.getReferenceLength() /4);//Actually suprised that setting the startindex worked
         for(int i = 0; i < readArrayOfSecondLevelCreation.length;i++){
             readViews[i] = new ReadView(readArrayOfSecondLevelCreation[i],this.info,levelArrayAsInteger[i]);
             }
         this.info.height.addListener((observable, oldValue, newValue) -> {
-            for(int i =0; i < readViews.length;i++){
-                readViews[i].updateHeight((double)newValue);
-                //readViews[i].updateStrokeWidth((double)newValue);
-
+            for (ReadView readView : readViews) {
+                readView.updateHeight((double) newValue);
             }
         });
-
-
-        //printLevelArrayforDebugging();
-        //checkIfLevelArrayisCorrect();
     }
-    private int calcReadCount(ObservableList< List< Read > >  listOfReadLists){
-        int readcount = 0;
-        for(int i = 0; i < listOfReadLists.size(); i++){
-            for(int j = 0; j <listOfReadLists.get(i).size();j++)
-                readcount++;
-        }
-        return readcount;
-    }
-
 
     /**
      * Super primitive form of creating a level-array. This method prioritizes to firstly put all circulars on top of each other, then fill in the rest.
@@ -103,47 +80,39 @@ public class CircularView {
      * @param readArray The array of reads given
      * @return  returns a levelArray
      */
-    private int[] createLevelArray(Read[] readArray){
+    private int[] createLevelArray(Read[] readArray) {
         //DO magic- so that we have a level-array
-
-
         ArrayList<Integer> occupancyOfLevels = new ArrayList<>();
-        ArrayList<Integer> endOfCircularReads= new ArrayList<>(); //this is the true End of the circulars != getAlignmentEnd
+        ArrayList<Integer> endOfCircularReads = new ArrayList<>(); //this is the true End of the circulars != getAlignmentEnd
         int[] tempArray;
-        tempArray = new int[(int)info.getGlobalLength()]; //TODO: clean up global info: ints where ints are needed, double where double are needed
+        tempArray = new int[info.getReferenceLength()];
         //This firstly adds in all the circular reads
-        for(int index = 0; index < readArray.length;index++){
-            if(readArray[index].isCrossBorder()){
+        for (int index = 0; index < readArray.length; index++) {
+            if (readArray[index].isCrossBorder()) {
                 occupancyOfLevels.add(readArray[index].getAlignmentEnd());
                 endOfCircularReads.add(readArray[index].getAlignmentStart());
-                tempArray[index] = occupancyOfLevels.size()-1; //First element is at level 0 2nd at 1 etc thus -1
+                tempArray[index] = occupancyOfLevels.size() - 1; //First element is at level 0 2nd at 1 etc thus -1
             }
         }
-        /*
-        System.out.println(occupancyOfLevels.toString());
-        System.out.println(occupancyOfLevels.size());
-        System.out.println(endOfCircularReads.toString());
-        System.out.println(endOfCircularReads.size());
-        */
         //Now we want to fill with the noncircular reads
         occupancyOfLevels.add(0); //this is currently the way to avoid that non-circular plasmids get a level-array=0 -> NEEDS a proper fix
         endOfCircularReads.add(0);//this is currently the way to avoid that non-circular plasmids get a level-array=0 -> NEEDS a proper fix
-        for(int index =0; index <readArray.length;index++){
-            if(!readArray[index].isCrossBorder()){
-                for(int level = 0; level < occupancyOfLevels.size();level++){
-                    if(occupancyOfLevels.get(level)<readArray[index].getAlignmentStart()&&(level<endOfCircularReads.size()&&readArray[index].getAlignmentEnd()<endOfCircularReads.get(level))){//We found a suitable spot for the read: no circularRead on the right side, on the left side no (circular/noncircular)read
-                        occupancyOfLevels.set(level,readArray[index].getAlignmentEnd());
-                        tempArray[index]=level;
+        for (int index = 0; index < readArray.length; index++) {
+            if (!readArray[index].isCrossBorder()) {
+                for (int level = 0; level < occupancyOfLevels.size(); level++) {
+                    if (occupancyOfLevels.get(level) < readArray[index].getAlignmentStart() && (level < endOfCircularReads.size() && readArray[index].getAlignmentEnd() < endOfCircularReads.get(level))) {//We found a suitable spot for the read: no circularRead on the right side, on the left side no (circular/noncircular)read
+                        occupancyOfLevels.set(level, readArray[index].getAlignmentEnd());
+                        tempArray[index] = level;
                         break;
                     }
-                    if(level == occupancyOfLevels.size()-1){//We traversed all to this-date known levels and found no suitable spot -> increase level by 1 and add it in the occupancy list
+                    if (level == occupancyOfLevels.size() - 1) {//We traversed all to this-date known levels and found no suitable spot -> increase level by 1 and add it in the occupancy list
                         occupancyOfLevels.add(readArray[index].getAlignmentEnd());
-                        tempArray[index]=level+1;
+                        tempArray[index] = level + 1;
                         break;
                     }
-                    if(level >=endOfCircularReads.size() &&occupancyOfLevels.get(level)<readArray[index].getAlignmentStart()){ //level is above the circular Reads, so we don´t have to worry about rightbound circular views
-                        occupancyOfLevels.set(level,readArray[index].getAlignmentEnd());
-                        tempArray[index]=level;
+                    if (level >= endOfCircularReads.size() && occupancyOfLevels.get(level) < readArray[index].getAlignmentStart()) { //level is above the circular Reads, so we don´t have to worry about rightbound circular views
+                        occupancyOfLevels.set(level, readArray[index].getAlignmentEnd());
+                        tempArray[index] = level;
                         break;
                     }
 
@@ -151,168 +120,97 @@ public class CircularView {
 
             }
         }
-    return tempArray;
+        return tempArray;
     }
 
-    public Integer[] createLevelArray( ObservableList< List< Read > > listOfReadLists, int startIndex){
-
-
-        /**
-         * To keep track if we even placed any Read in the current Level, this enables us that if we went through all the possible Indexes of the given Array and have´t placed a Read in, we can deduce that we no longer have ANY remaining reads.
-         * Also it enables us to divide the cases:
-         *  - that we still need to determine the bounds (which are already filled with reads) because we haven´t placed anything yet.
-         *  - that we already placed something in this level (,have determined the bounds which are filled) and only need to check if next candidates fit in the empty parts of the levelRing
-         */
+    /**
+     * Creates a levelArray: the principle of this Method is bound to the given datatype:
+     * We are given a List of List of Reads.
+     * The index of the List represents the Baseposition of the reads.
+     * If there are multiple(if any) Reads starting at the same position they are decreasingly sorted by their length.
+     * a startIndex is also given, representing the position of the Ring where we start to try and place Reads.
+     *  - this can vary from approach but for the first Implementation it is assumed its value is the leftPosition of the most left gapclosing Read
+     *
+     *  The Procedure can be broken down:
+     *  - we traverse the given Array from start to End(i). Since we want to start at the startIndex our acessing indexes are thus calculated like this array[i+startIndex%gLength)
+     *  - if we haven´t already placed a firstRead in the current level, we have to do that: (so we know our left and right bounds)
+     *      - we didnt find a read at the current Position, we increment the index and move along
+     *      - if we aren´t able to place a read in the current level, and haven´t already placed one  we can only conclude that there is nothing left
+     *  - if we have placed a first Read in the current Level, we can check at the next possible locations if there are any suitiable entries in the (we can skip incrementing soem and start looking at the end of the last read)
+     *      - there are entries: so we first check if the last(smallest) entry in the list would fit.
+     *          - If it doesnt we can assume that everything else in that list doesnt fit aswell. So we increment the index and move along
+     *          - If it does fit we can now traverse the list in order till we find the biggest still fitting read.
+     *      - there are no entries:
+     *          - but we still have indexes to traveL: so we increment the index and move along
+     *          - we no longer can increase the index: SO we simply add another ring(level), reset the variables so that we are in a new level and contiue working till every Read is distributed
+     * @param listOfReadLists
+     * @param startIndex
+     * @return
+     */
+    private Integer[] createLevelArray(List<List<Read>> listOfReadLists, int startIndex){
         boolean firstReadInLevelSet = false;
-        /**
-         * ArrayList to store the Levels of the Reads. levelArraylist(i) is the level of the read at readArrayList(i)
-         */
-        List <Integer> levelArrayList= new ArrayList<Integer>();
-        /**
-         * Arraylist to store our reads that are already processed and assigned a level: levelArraylist(i) is the level of the read at readArrayList(i)
-         */
-        List <Read> readArrayList = new ArrayList<Read>();
-
-        /**
-         * if this gets true, we visited an entire (empty) levelRing without placing anything. Thus we logically have nothing left to place - and have distributed everything.
-         */
+        List <Integer> levelArrayList= new ArrayList<>();
+        List <Read> readArrayList = new ArrayList<>();
         boolean allDistributed = false;
-        /**
-         * left Bound of our filled Segment of the levelRing (typically read.getAlignmentEnd of the firstly placed read. (if the first read is circular start&End are swapped)
-         */
         int leftBound=0;
-        /**
-         * is simply the amount of Indexes thelistOfReadLists has, thus the total referenceLength, not exactly necessarily but used to keep the expressions shorter.
-         */
         int gLength=listOfReadLists.size();
-        /**
-         * simple counter for our index in the method
-         */
         int index=0;
-        /**
-         * simple counter for our levele in the method
-         */
         int level=0;
-        /**
-         * Creates a levelArray: the principle of this Method is bound to the given datatype:
-         * We are given an Array of readArrayLists.
-         * The index of the Array represents the Baseposition of the reads.
-         * If there are multiple(if any) Reads starting at the same position they are decreasingly sorted by their length.
-         * a startIndex is also given, representing the position of the Ring where we start to try and place Reads.
-         *  - this can vary from approach but for the first Implementation it is assumed its value is the leftPosition of the most left gapclosing Read
-         *
-         *  The Procedure can be broken down:
-         *  - we traverse the given Array from start to End(i). Since we want to start at the startIndex our acessing indexes are thus calculated like this array[i+startIndex%gLength)
-         *  - if we haven´t already placed a firstRead in the current level, we have to do that: (so we know our right&left bounds)
-         *      - we didnt find a read at the current Position, we increment the index and move along
-         *      - if we aren´t able to place a read in the current level, and haven´t already placed one  we can only conclude that there is nothing left
-         *  - if we have placed a first Read in the current Level, we can check at the next possible locations if there are any entries in the Array
-         *      - there are entries: so we first check if the last entry in the list would fit.
-         *          - If it doesnt we can assume that everything else in that list doesnt fit aswell. So we increment the index and move along
-         *          - If it does fit we can now traverse the list in order till we find the fitting read.
-         *      - there are no entries:
-         *          - but we still have indexes to traveL: so we increment the index and move along
-         *          - we no longer can increase the index: SO we simply add another ring(level), reset the variables so that we are in a new level and contiue working till every Read is distributed
-         */
 
+
+        String before,
+                after;
+        before = CircularParser.Reads.getReadsSorted().toString();
         long timeBefore,
                 timeAfter;
         timeBefore = System.currentTimeMillis();
-        int readcount = 0;
-        for(int i = 0; i < listOfReadLists.size(); i++){
-            for(int j = 0; j <listOfReadLists.get(i).size();j++)
-                readcount++;
-        }
-        int firstplaced = 0;
-        int placed = 0;
-        deleteWeirdReads(listOfReadLists);
+        listOfReadLists = deleteWeirdReads(listOfReadLists);
         while(!allDistributed){
            while(index <gLength){ // - we traverse the given Array from start to End(i). Since we want to start at the startIndex our acessing indexes are thus calculated like this array[i+startIndex%gLength)
                if (!firstReadInLevelSet){ // - if we haven´t already placed a firstRead in the current level, we have to do that: (so we know our right&left bounds)
                    if(!listOfReadLists.get((index+startIndex)%gLength).isEmpty()){ // we are able to place a first Read in the level.
-                       // Insert add-procedure here
-                       //System.out.println("we are able to place a first Read in the level: Index is (" + (index+startIndex)%gLength +") and the readname is " + listOfReadLists.get((index+startIndex)%gLength).get(0));
                        firstReadInLevelSet=true;
-                       firstplaced++;
-                       placed++;
                        leftBound=listOfReadLists.get((index+startIndex)%gLength).get(0).getAlignmentStart()-1;
-                       //System.out.println("our Rightbound is now: "+rightBound +" and our Leftbound is " + leftBound);
                        readArrayList.add(listOfReadLists.get((index+startIndex)%gLength).get(0));
                        levelArrayList.add(level);
-                       //System.out.println("added something: " + readArrayList.get(readArrayList.size()-1).getName() + "at level" + levelArrayList.get(levelArrayList.size()-1));
                        int tempLength = listOfReadLists.get((index+startIndex)%gLength).get(0).getAlignmentLength();
-
-                       int tempIndex =listOfReadLists.get((index+startIndex)%gLength).get(0).getAlignmentEnd()-1;
                        listOfReadLists.get((index+startIndex)%gLength).remove(0);
-                       //index+=tempIndex;
                        index+=tempLength;
-                       //System.out.println("first read in current level placed");
-                       //System.out.println("our Index now changed to: " + index);
                        if(index>=gLength-1){  //- we no longer can increase the index: SO we simply add another ring(level), reset the variables so that we are in a new level and contiue working till every Read is distributed
-                           //System.out.println("we are going to increase the level: current level before incrementation: " + level + "index before level increase: " + index);
                            level++;
                            firstReadInLevelSet=false;
                            index = 0;
-
                            leftBound=0; //Possibly not needed | Because it gets set at firstRead anyway
-
-
                        }
-
-
-
                    }
                    else if(index == gLength-1&&listOfReadLists.get((index+startIndex)%gLength).isEmpty()){ // - if we aren´t able to place a read in the current level, and haven´t already placed one  we can only conclude that there is nothing left.
-                       //System.out.println("we are done, all Distributed is set");
-                       //System.out.println(firstplaced);
                        allDistributed=true;
-                       readArrayOfSecondLevelCreation= readArrayList.toArray(new Read[readArrayList.size()]);
+                       readArrayOfSecondLevelCreation= readArrayList.toArray(new Read[0]);
                        break;
-
                    }
                    else { //  - we didnt find a read at the current Position, we increment the index and move along
-                       //System.out.println("We didnt find a read at the current position we increment the index and move along, index before incrementation: "+index);
                        index++;
-
                    }
                }
                else { //- if we have placed a first Read in the current Level, we can check at the next possible locations if there are any entries in the Array
                    if (!listOfReadLists.get((index+startIndex)%gLength).isEmpty()){ //- there are entries: so we first check if the last entry in the list would fit.
-
                        if (listOfReadLists.get((index+startIndex)%gLength).get(listOfReadLists.get((index+startIndex)%gLength).size()-1).getAlignmentLength()>((gLength-index)+leftBound)){ //  - If it doesnt we can assume that everything else in that list doesnt fit aswell. So we increment the index and move along
-                           //System.out.println("already placed something, but didnt find another fitting read at the current position, we increment the index and keep looking");
                            index++;
                        }
                        else { // - If it does fit we can now traverse the sublist in order till we find the longest fitting read.
-                           //System.out.println("we found a read that fits so:");
-                           //System.out.println(listOfReadLists.get(index));
-                           //System.out.println(listOfReadLists.get((index+startIndex)%gLength).size());
                            for (int j = 0; j < listOfReadLists.get((index+startIndex)%gLength).size();j++){
                                if (listOfReadLists.get((index+startIndex)%gLength).get(j).getAlignmentLength()<=((gLength-index+leftBound))){
-                                   //insert add-procedure here
-                                   placed++;
                                    readArrayList.add(listOfReadLists.get((index+startIndex)%gLength).get(j));
                                    levelArrayList.add(level);
                                    int tempLength = listOfReadLists.get((index+startIndex)%gLength).get(j).getAlignmentLength();
-                                   int tempIndex = listOfReadLists.get((index+startIndex)%gLength).get(j).getAlignmentEnd()-1;
-
                                    listOfReadLists.get((index+startIndex)%gLength).remove(j);
                                    index += tempLength;
-                                   //index = tempIndex;
-                                   //System.out.println("we are gonna add something, this isnt the first in this level, index now "+ index + " current percentage of distributed reads is: " + ((double)readArrayList.size()/(double)readcount));
                                    if(index>=gLength-1){  //- we no longer can increase the index: SO we simply add another ring(level), reset the variables so that we are in a new level and contiue working till every Read is distributed
-                                       //System.out.println("we are going to increase the level: currentl level before incrementation: " + level);
                                        level++;
-                                       
                                        firstReadInLevelSet=false;
                                        index = 0;
-                                       leftBound=0;
-
-                                       //Possibly not needed | Because it gets set at firstRead anyway
-
+                                       leftBound=0; //Possibly not needed | Because it gets set at firstRead anyway
                                    }
-
-
                                }
                            }
                        }
@@ -320,52 +218,61 @@ public class CircularView {
                    }
                    else { //- there are no entries:
                        if(index>=gLength-1){  //- we no longer can increase the index: SO we simply add another ring(level), reset the variables so that we are in a new level and contiue working till every Read is distributed
-                           //System.out.println("we are going to increase the level: currentl level before incrementation: " + level);
                            level++;
                            firstReadInLevelSet=false;
-
                            index = 0;
                            leftBound=0; //Possibly not needed | Because it gets set at firstRead anyway
                        }
                        else { // - but we still have indexes to traveL: so we increment the index and move along
-                           //System.out.println("there are no entries, but we still have indexes to travel: current index (" + index+ ")");
                            index++;
                        }
-
                    }
-
-
                }
-
-
             }
-
         }
-        //System.out.println(levelArrayList.toString());
-        //System.out.println(readcount);
         timeAfter = System.currentTimeMillis();
         System.out.println("The creation of the level-array took " + (timeAfter-timeBefore) + "milliseconds");
-        return levelArrayList.toArray(new Integer[levelArrayList.size()]);
-
+        after = CircularParser.Reads.getReadsSorted().toString();
+        if(!before.equals(after)) System.out.println("CHANGE OF DATA");
+        return levelArrayList.toArray(new Integer[0]);
     }
-    public void enableCacheOfReadViews(){
-        for(int i = 0; i < readViews.length; i++){
-            readViews[i].getArchSegment().getInner().setCache(true);
+
+    /**
+     * Changes the color of all the ReadViews, depending if they are gapcloser/reversed/normal they get assigned their new color value.
+     * @param colorGapCloser
+     * @param colorReversed
+     * @param colorNormal
+     */
+    public void changeColor(Color colorGapCloser, Color colorReversed, Color colorNormal){
+        for(ReadView rW: readViews){
+            if(rW.getRead().isCrossBorder()){
+                rW.getArchSegment().setColor(colorGapCloser);
+            }
+            else if(rW.getRead().getNegativeStrandFlag()){
+                rW.getArchSegment().setColor(colorReversed);
+            }
+            else{
+                rW.getArchSegment().setColor(colorNormal);
+            }
+        }
+    }
+    //TODO: add method with color + flag to set a specific case only
+    void enableCacheOfReadViews(){
+        for (ReadView readView : readViews) {
+            readView.getArchSegment().getInner().setCache(true);
         }
     }
     public void disableCacheOfReadViews(){
-        for(int i = 0; i < readViews.length; i++){
-            readViews[i].getArchSegment().getInner().setCache(false);
+        for (ReadView readView : readViews) {
+            readView.getArchSegment().getInner().setCache(false);
         }
     }
-    public void cacheToQuality(){
-        System.out.println("setting to quality in progress");
+    void cacheToQuality(){
         for(ReadView rW: readViews){
             rW.getArchSegment().getInner().setCacheHint(CacheHint.QUALITY);
         }
-        System.out.println("done");
     }
-    public void cacheToSpeed(){
+    void cacheToSpeed(){
         for(ReadView rW:readViews){
             rW.getArchSegment().getInner().setCacheHint(CacheHint.SPEED);
         }
@@ -378,6 +285,9 @@ public class CircularView {
         return levelArray;
     }
 
+    /**
+     * generic print-function for debugging-Purposes
+     */
     public void printLevelArrayforDebugging(){
         int currentLevel = 0;
         String[] printText = new String[levelArrayAsInteger[levelArrayAsInteger.length-1]+1];
@@ -391,16 +301,15 @@ public class CircularView {
             }
             else{
                 printText[currentLevel] += "s:"+ readArrayOfSecondLevelCreation[i].getAlignmentStart()+ " l:" + readArrayOfSecondLevelCreation[i].getAlignmentLength() + " e:" + readArrayOfSecondLevelCreation[i].getAlignmentEnd() + " ";
-
             }
         }
         for (String s:printText) {
             System.out.println(s);
         }
-
-
-
     }
+    /**
+     * generic print-function for debugging-Purposes
+     */
     public void checkIfLevelArrayisCorrect(){
         int currentLevel = 0;
         int currentEnd = 0;
@@ -426,12 +335,7 @@ public class CircularView {
              if(onecrossborderperlevel){
                 if(levelArrayAsInteger[i]!=currentLevel){
                     currentLevel++;
-                    if(readArrayOfSecondLevelCreation[i].isCrossBorder()) {
-                        onecrossborderperlevel= true;
-                    }
-                    else{
-                        onecrossborderperlevel=false;
-                    }
+                    onecrossborderperlevel = readArrayOfSecondLevelCreation[i].isCrossBorder();
                 }
                 else{
                     if(readArrayOfSecondLevelCreation[i].isCrossBorder()) correctPlacement[currentLevel] = false;
@@ -440,20 +344,12 @@ public class CircularView {
             if(!onecrossborderperlevel){
                 if(levelArrayAsInteger[i]!=currentLevel){
                     currentLevel++;
-                    if(readArrayOfSecondLevelCreation[i].isCrossBorder()){
-                        onecrossborderperlevel = true;
-
-                    }
-                    else{
-                        onecrossborderperlevel=false;
-                    }
+                    onecrossborderperlevel = readArrayOfSecondLevelCreation[i].isCrossBorder();
                 }
                 else{
                     if(readArrayOfSecondLevelCreation[i].isCrossBorder()) onecrossborderperlevel = true;
                 }
             }
-
-
         }
         for (boolean s:correctPlacement) {
             System.out.println(s);
@@ -465,7 +361,6 @@ public class CircularView {
                 //System.out.println("Read with 0 length detected starting at" + r.getAlignmentStart()+ "ending at: " + r.getAlignmentEnd() + "IsCrossBorder " +r.isCrossBorder() + "Readname: "+ r.getName() + "Sequence: " + r.getSequence());
                 wrongLengthcount++;
             }
-
         }
         //System.out.println("amount of wrong length reads: " + wrongLengthcount);
         for(Read r: readArrayOfSecondLevelCreation){
@@ -473,24 +368,18 @@ public class CircularView {
             start = r.getAlignmentStart();
             end = r.getAlignmentEnd();
             length= r.getAlignmentLength();
-            reallength=(int)info.getGlobalLength()-start+end;
+            reallength= info.getReferenceLength() -start+end;
             //if(r.isCrossBorder()) System.out.println("Crossborder starting at:" + start+ " length of: "+length+ " ending at: "+ end + " Math: referenceLength -alignmentStart + alignmentEnd = alignmentLength: ("+ (int)info.getGlobalLength() + "-"+start +")+"+end+ "="+reallength+" "+ " !=" + length);
             //if(!r.isCrossBorder()) System.out.println("Read starting at: "+ start+" length of: "+ length +" end at: "+end);
         }
     }
-    private void printGivenReadList(ObservableList< List< Read > >  listOfReadLists){
-        for(List<Read> readList:listOfReadLists){
-            String temp= "";
-            if(!readList.isEmpty()){
-                for(Read read:readList){
-                    temp+=" s: " +read.getAlignmentStart() + " l: "+read.getAlignmentLength() + " e: " + read.getAlignmentEnd();
-                }
-                System.out.println(temp);
-            }
 
-        }
-    }
-    private ObservableList< List< Read > > deleteWeirdReads(ObservableList< List< Read > >  listOfReadLists){
+    /**
+     * Basis on this function is, that weird reads exist with a sequence of only "*". their length is inproperly set from SAM-Reader. Possibly unneccesaary - recheck
+     * @param listOfReadLists
+     * @return
+     */
+    private List< List< Read > > deleteWeirdReads(List< List< Read > >  listOfReadLists){
         for(List<Read> list:listOfReadLists) {
             for (Read read : list) {
                 if(Objects.equals(read.getSequence(), "*")) read.setAlignmentLength(read.getAlignmentEnd()-read.getAlignmentStart());
@@ -498,7 +387,4 @@ public class CircularView {
         }
         return listOfReadLists;
     }
-
-
-
 }

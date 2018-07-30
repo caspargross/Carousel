@@ -12,7 +12,7 @@ package main.model;
 public class FastaSequence {
 
     /**
-     * The identifier of this FASTA sequence which means the first word after the > character in a header.
+     * The identifier of this FASTA sequence which means the first word after the <pre>{@code >}</pre> character in a header.
      */
     private String identifier;
 

@@ -30,11 +30,11 @@ public class FastaParser {
      * <p>
      * Parses the FASTA file according to this structure:
      * <p>
-     * > [Identifier] [Description]
+     * <pre>{@code > [Identifier] [Description]}</pre>
      * <p>
      * [Sequence]
      * <p>
-     * That is to say, identifier will contain the first word after the > digit and description will contain the rest of
+     * That is to say, identifier will contain the first word after the <pre>{@code >}</pre> digit and description will contain the rest of
      * the header line.
      *
      * @param fastaFile the FASTA file to open and parse
