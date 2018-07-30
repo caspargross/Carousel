@@ -133,7 +133,7 @@ public class CircularView {
      *
      *  The Procedure can be broken down:
      *  - we traverse the given Array from start to End(i). Since we want to start at the startIndex our acessing indexes are thus calculated like this array[i+startIndex%gLength)
-     *  - if we haven´t already placed a firstRead in the current level, we have to do that: (so we know our right&left bounds)
+     *  - if we haven´t already placed a firstRead in the current level, we have to do that: (so we know our left and right bounds)
      *      - we didnt find a read at the current Position, we increment the index and move along
      *      - if we aren´t able to place a read in the current level, and haven´t already placed one  we can only conclude that there is nothing left
      *  - if we have placed a first Read in the current Level, we can check at the next possible locations if there are any suitiable entries in the (we can skip incrementing soem and start looking at the end of the last read)

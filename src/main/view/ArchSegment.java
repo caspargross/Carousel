@@ -26,7 +26,7 @@ public class ArchSegment {
     private GlobalInformation info;
 
     /**
-     * helper function to determine our standard color of the Read. (Gapclosers => RED, Reversed Reads => BLUE, else => BLACK(
+     * helper function to determine our standard color of the Read.
      */
     private void determinteStandardColor(){
         if(isGapcloser){

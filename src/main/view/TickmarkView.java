@@ -22,6 +22,7 @@ public class TickmarkView extends AnchorPane {
         gInfo.height.addListener((observable, oldValue, newValue) ->{
                 for(TickmarkPane childrenPane:paneList){
                     childrenPane.updateHeight(newValue.doubleValue()/oldValue.doubleValue());
+                    System.out.println("height changed");
                 }
         });
     }
