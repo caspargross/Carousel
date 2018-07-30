@@ -24,8 +24,6 @@ public class ReadView {
         this.archSegment = new ArchSegment(read,info,level);
     }
 
-    //GETTER
-
     /**
      * returns the Read of the ReadView object
      * @return the Read
@@ -57,4 +55,6 @@ public class ReadView {
     public void updateStrokeWidth(double newValue){
         this.archSegment.setStrokeWidth(newValue);
     }
+
+
 }

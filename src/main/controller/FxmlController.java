@@ -1,41 +1,24 @@
 package main.controller;
 
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.*;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.SplitPane;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.transform.Transform;
 import javafx.stage.FileChooser;
 import main.model.CircularParser;
-import main.model.Read;
-import main.view.CircularView;
-import main.view.GlobalInformation;
-import main.view.MainView;
 import main.view.MiddlePane;
-import playground.Coordinate;
 import javafx.scene.image.WritableImage;
 import java.awt.image.BufferedImage;
 
-import javafx.application.Application;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
+
 import javax.imageio.ImageIO;
 import java.io.IOException;
 
 
 import java.io.File;
-import java.util.List;
 
 public class FxmlController {
 
