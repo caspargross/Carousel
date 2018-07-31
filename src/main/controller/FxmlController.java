@@ -3,10 +3,11 @@ package main.controller;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.*;
-import javafx.scene.control.SplitPane;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import main.model.CircularParser;
+import main.model.Read;
 import main.model.statistics.PositionSpecificReadCoverage;
 import main.view.MainView;
 import javafx.scene.image.WritableImage;
@@ -35,6 +36,7 @@ public class FxmlController {
     // Controller elements
     private File fastaFile=null;
     private File bamFile=null;
+    private int amountOfReads;
 
     // FXML Elements
 
@@ -44,7 +46,7 @@ public class FxmlController {
     private VBox fileLoaderVBox;
 
     @FXML
-    private MainView mainPane;
+    private MiddlePane mainPane;
 
     @FXML
     private javafx.scene.control.TextField fastaPath;
@@ -52,6 +54,23 @@ public class FxmlController {
 
     @FXML
     private javafx.scene.control.TextField bamPath;
+
+    @FXML
+    private ToggleGroup tgRadioButtons;
+
+    @FXML
+    private ToggleButton rbRandom;
+
+    @FXML
+    private ToggleButton rbStart;
+
+    @FXML
+    private ToggleButton rbLength;
+
+    @FXML
+    private ToggleButton rbCrossBeforeRandom;
+
+
 
     @FXML
     void menuExit(ActionEvent e)
@@ -63,14 +82,26 @@ public class FxmlController {
         System.out.println("Exit called");
     }
 
+
+
     @FXML
-    void fileMenuConfirm(ActionEvent e){
-        if(fastaFile != null && bamFile != null)
-        {
-           Stage stage = (Stage) fileLoaderVBox.getScene().getWindow();
-           stage.close();
+    void fileMenuConfirm(ActionEvent e) {
+        if (fastaFile != null && bamFile != null) {
+            try {
+                startView();
+                Stage stage = (Stage) fileLoaderVBox.getScene().getWindow();
+                stage.close();
+
+            } catch (Exception e1) {
+                e1.printStackTrace();
+            }
+
+        } else {
+            Alert inputFileMissing = new Alert(Alert.AlertType.ERROR, "Missing Input File");
         }
     }
+
+
 
     @FXML
     void fileMenuCancel(ActionEvent e) {
@@ -104,7 +135,7 @@ public class FxmlController {
 
         Stage histStage = new Stage();
         histStage.setTitle("Position specific read coverage");
-        PositionSpecificReadCoverage.computePSRC(bamFile);
+        PositionSpecificReadCoverage.computePSRC(this.bamFile);
 
         Pane histPane = new Pane( );
         histPane.getChildren( ).add( PSRCBarChart.createBarChartFromPSRC( startIndex, endIndex ) );
@@ -163,13 +194,6 @@ public class FxmlController {
             bamPath.setText(myBam.toString());
         }
 
-
-        try {
-            startView();
-        } catch (Exception e1) {
-            e1.printStackTrace();
-        }
-
     }
 
 
@@ -214,6 +238,23 @@ public class FxmlController {
     @FXML
     void initialize() {
 
+        amountOfReads = 500;
+
+
+        rbLength=new RadioButton();
+        rbStart=new RadioButton();
+        rbRandom=new RadioButton();
+        rbCrossBeforeRandom=new RadioButton();
+        tgRadioButtons = new ToggleGroup();
+
+        rbLength.onActionProperty().setValue(e -> CircularParser.Reads.setAmountOfReadsShown(amountOfReads, CircularParser.Reads.Order.AlignmentLength));
+        rbStart.onActionProperty().setValue(e -> CircularParser.Reads.setAmountOfReadsShown(amountOfReads, CircularParser.Reads.Order.AlignmentStart));
+        rbRandom.onActionProperty().setValue(e -> CircularParser.Reads.setAmountOfReadsShown(amountOfReads, CircularParser.Reads.Order.Random));
+        rbCrossBeforeRandom.onActionProperty().setValue(e -> CircularParser.Reads.setAmountOfReadsShown(amountOfReads, CircularParser.Reads.Order.CrossBorderBeforeRandom));
+
+
+        tgRadioButtons.selectToggle(rbRandom);
+
     }
 
 
@@ -224,12 +265,8 @@ public class FxmlController {
 
     private void startView() throws Exception {
 
-
+        this.mainPane = new MiddlePane();
         this.mainPane.setStyle("-fx-background-color: #ffffff");
-        this.mainPane.getChildren().clear();
-        this.mainPane.getChildren().add(new MiddlePane());
-
-
 
         String baiFileName = bamFile.getAbsolutePath();
         baiFileName = baiFileName.replace(".bam", ".bai");

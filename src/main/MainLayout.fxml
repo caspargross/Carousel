@@ -18,6 +18,7 @@
 <?import javafx.scene.text.Font?>
 <?import main.view.MainView?>
 
+<?import main.view.MiddlePane?>
 <VBox prefHeight="1000.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.controller.FxmlController">
 <children>
     <MenuBar VBox.vgrow="NEVER">
@@ -47,13 +48,14 @@
                                 <children>
                                     <VBox id="VBox" alignment="TOP_LEFT" layoutX="14.0" layoutY="5.0" spacing="10.0">
                                         <children>
-                                            <RadioButton fx:id="lEshowAtoms" mnemonicParsing="false" prefWidth="192.0" selected="true" text="CrossborderBeforeRandom">
-                                       <toggleGroup>
-                                          <ToggleGroup fx:id="tgRadioButtons" />
-                                       </toggleGroup></RadioButton>
-                                            <RadioButton fx:id="lEshowBonds" mnemonicParsing="false" text="Random" toggleGroup="$tgRadioButtons" />
-                                            <RadioButton fx:id="lEshowSecondaryStructure" mnemonicParsing="false" text="AlignmentStart" toggleGroup="$tgRadioButtons" />
-                                            <RadioButton fx:id="lEshowRibbons" mnemonicParsing="false" text="AlignmentLength" toggleGroup="$tgRadioButtons" />
+                                            <fx:define>
+                                                <ToggleGroup fx:id="tgRadioButtons" />
+                                            </fx:define>
+
+                                            <RadioButton fx:id="rbCrossBeforeRandom" mnemonicParsing="false" prefWidth="192.0" selected="true" toggleGroup="$tgRadioButtons" text="CrossborderBeforeRandom" />
+                                            <RadioButton fx:id="rbRandom" mnemonicParsing="false" text="Random" toggleGroup="$tgRadioButtons" />
+                                            <RadioButton fx:id="rbStart" mnemonicParsing="false" text="AlignmentStart" toggleGroup="$tgRadioButtons" />
+                                            <RadioButton fx:id="rbLength" mnemonicParsing="false" text="AlignmentLength" toggleGroup="$tgRadioButtons" />
                                         </children>
                                     </VBox>
                                 </children>
@@ -62,8 +64,12 @@
                     </TitledPane>
                 </panes>
             </Accordion>
-            <MainView fx:id="mainPane">
-            </MainView>
+            <AnchorPane style="-fx-background-color: white">
+                <MiddlePane fx:id="mainPane" AnchorPane.topAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.bottomAnchor="0.0">
+                </MiddlePane>
+
+            </AnchorPane>
+
         </items>
     </SplitPane>
     <HBox id="HBox" alignment="CENTER_LEFT" spacing="5.0" VBox.vgrow="NEVER">
@@ -78,7 +84,7 @@
             </Label>
             <Pane prefHeight="-1.0" prefWidth="-1.0" HBox.hgrow="ALWAYS">
                <children>
-                  <Label layoutX="34.0" layoutY="4.0" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="File Name">
+                  <Label layoutX="34.0" layoutY="4.0" maxHeight="1.7976931348623157E308" maxWidth="-1.0" text="File Name" fx:id="bamName">
                      <font>
                         <Font size="11.0" fx:id="x31" />
                      </font>

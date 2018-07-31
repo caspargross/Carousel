@@ -14,8 +14,8 @@ public class MiddlePane extends AnchorPane {
     private LabelView labelView;
     public MiddlePane(){
         mainView = new MainView();
-        this.setHeight(800);
-        this.setWidth(1400);
+        this.setHeight(1000);
+        this.setWidth(1800);
         setupRescale();
         this.getChildren().add(mainView);
 
