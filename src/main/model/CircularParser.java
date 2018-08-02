@@ -191,11 +191,13 @@ public class CircularParser {
          * The passed order relation is applied before transferring any Read objects from one list to the other.
          *
          * @param amountToShow  the amount of Read objects to be shown
-         * @param orderRelation the order relation to be applied bfore transferring any Read objects
+         * @param orderRelation the order relation to be applied before transferring any Read objects
          */
-        public static void setAmountOfReadsShown( int amountToShow, Comparator< Read > orderRelation ) {
+        public static void setAmountOfReadsShown( int amountToShow, Comparator< Read > orderRelation ) throws Exception {
             if( Shown.size( ) == amountToShow )
                 return;
+            else if( amountToShow < 0 || amountToShow > Shown.size( ) + Hidden.size( ) )
+                throw new Exception( "The value of amountToShow must be between 0 and Shown.size( ) + Hidden.size( )." );
             else {
                 int amountToTransfer;
                 List< Read > source,
@@ -517,7 +519,8 @@ public class CircularParser {
      * Constructs a cross-border read given two presentations of the same read aligned fittingly such that one overlaps
      * at the beginning and the other one at the end. Updates alignmentStart / getAlignmentEnd, builds a new fitting
      * Cigar combing the two old ones and transfers the sequence from the newReadRecord if the oldRead is hard clipped.
-     * After applying the algorithm, <pre>{@code ( Read is combined <=> read.alignmentStart > read.alignmentEnd )}</pre> holds.
+     * After applying the algorithm, <pre>{@code ( Read is combined <=> read.alignmentStart > read.alignmentEnd )}</pre>
+     * holds.
      *
      * @param oldRead       the read which was already seen by the CircularParser
      * @param newReadRecord the new read found in the BAM record
